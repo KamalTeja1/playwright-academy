@@ -14,20 +14,27 @@ export function TopBar() {
         <Link href="/" className="hover:text-[#007AC3] font-medium">
           Home
         </Link>
-        {crumbs.map((crumb, i) => (
-          <span key={i} className="flex items-center gap-2">
-            <span className="text-[#7c8ea0]/60">/</span>
-            <span
-              className={
-                i === crumbs.length - 1
-                  ? "text-[#0c2536] font-semibold"
-                  : "hover:text-[#007AC3] font-medium"
-              }
-            >
-              {crumb.charAt(0).toUpperCase() + crumb.slice(1)}
+        {crumbs.map((crumb, i) => {
+          const href = "/" + crumbs.slice(0, i + 1).join("/");
+          const isLast = i === crumbs.length - 1;
+          const label = crumb.charAt(0).toUpperCase() + crumb.slice(1);
+
+          return (
+            <span key={href} className="flex items-center gap-2">
+              <span className="text-[#7c8ea0]/60">/</span>
+              {isLast ? (
+                <span className="text-[#0c2536] font-semibold">{label}</span>
+              ) : (
+                <Link
+                  href={href}
+                  className="hover:text-[#007AC3] font-medium transition-colors"
+                >
+                  {label}
+                </Link>
+              )}
             </span>
-          </span>
-        ))}
+          );
+        })}
       </nav>
 
       <ThemeToggle />

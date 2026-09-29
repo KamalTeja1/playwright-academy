@@ -2,6 +2,7 @@
 
 import { use, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import ReactMarkdown from "react-markdown";
 import {
@@ -34,9 +35,10 @@ export default function TopicPage({
 }: {
   params: Promise<{ topicSlug: string }>;
 }) {
-  const { topicSlug } = use(params);
-  const topic = getTopicBySlug(topicSlug);
-  const [activeTab, setActiveTab] = useState<TabKey>("notes");
+const router = useRouter();
+const { topicSlug } = use(params);
+const topic = getTopicBySlug(topicSlug);
+const [activeTab, setActiveTab] = useState<TabKey>("notes");
 
   if (!topic) {
     return (
@@ -65,13 +67,13 @@ export default function TopicPage({
   return (
     <div className="px-6 md:px-12 py-8 max-w-5xl mx-auto">
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
-        <Link
-          href="/phases"
-          className="inline-flex items-center gap-2 text-[13px] text-[#46586a] hover:text-[#007AC3] font-medium mb-6 transition-colors"
-        >
-          <ArrowLeft size={14} weight="bold" />
-          Back
-        </Link>
+        <button
+  onClick={() => router.back()}
+  className="inline-flex items-center gap-2 text-[13px] text-[#46586a] hover:text-[#007AC3] font-medium mb-6 transition-colors"
+>
+  <ArrowLeft size={14} weight="bold" />
+  Back
+</button>
 
         <div className="text-[12px] uppercase text-[#7c8ea0] tracking-wider font-bold mb-2">
           Topic

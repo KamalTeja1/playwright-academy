@@ -1,5 +1,5 @@
 export type CodeExample = {
-  language: "python" | "typescript" | "javascript" | "bash" | "text";
+  language: "python" | "typescript" | "javascript" | "bash" | "text" | "markdown";
   title: string;
   code: string;
 };

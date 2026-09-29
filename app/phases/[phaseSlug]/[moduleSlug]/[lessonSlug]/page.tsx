@@ -1,7 +1,8 @@
 "use client";
 
-import { use } from "react";
+import { use, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import {
   ArrowLeft,
@@ -12,6 +13,7 @@ import {
 } from "@phosphor-icons/react/dist/ssr";
 import { getPhaseBySlug } from "@/lib/data/curriculum";
 import { getModuleLessons } from "@/lib/data/lessons";
+import { getTopicBySlug } from "@/lib/data/topics";
 
 export default function LessonDetailPage({
   params,
@@ -22,11 +24,20 @@ export default function LessonDetailPage({
     lessonSlug: string;
   }>;
 }) {
+  const router = useRouter();
   const { phaseSlug, moduleSlug, lessonSlug } = use(params);
   const phase = getPhaseBySlug(phaseSlug);
   const mod = phase?.modules.find((m) => m.slug === moduleSlug);
   const lessons = getModuleLessons(moduleSlug);
   const lesson = lessons?.find((l) => l.slug === lessonSlug);
+  const lessonHasContent = !!getTopicBySlug(lessonSlug);
+
+  // Auto-redirect: lesson IS a topic → go straight to topic page
+  useEffect(() => {
+    if (lessonHasContent && lesson && lesson.topics.length === 0) {
+      router.replace(`/topics/${lessonSlug}`);
+    }
+  }, [lessonHasContent, lesson, lessonSlug, router]);
 
   if (!phase || !mod || !lesson) {
     return (
@@ -34,9 +45,7 @@ export default function LessonDetailPage({
         <h1 className="text-[32px] font-extrabold text-[#0c2536] mb-3">
           Lesson not found
         </h1>
-        <p className="text-[#46586a] mb-6">
-          We couldn't find that lesson.
-        </p>
+        <p className="text-[#46586a] mb-6">We couldn't find that lesson.</p>
         <Link
           href="/phases"
           className="inline-flex items-center gap-2 px-6 py-3 rounded-[10px] text-white font-semibold text-[13.5px]"
@@ -48,6 +57,21 @@ export default function LessonDetailPage({
           <ArrowLeft size={16} weight="bold" />
           Back to all phases
         </Link>
+      </div>
+    );
+  }
+
+  // While redirecting, show a friendly message
+  if (lessonHasContent && lesson.topics.length === 0) {
+    return (
+      <div className="px-6 md:px-12 py-20 max-w-3xl mx-auto text-center">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="text-[14px] text-[#46586a]"
+        >
+          Opening lesson…
+        </motion.div>
       </div>
     );
   }
@@ -73,7 +97,7 @@ export default function LessonDetailPage({
           {lesson.summary}
         </p>
 
-        <div className="flex flex-wrap items-center gap-4 mb-10">
+        <div className="flex flex-wrap items-center gap-4 mb-8">
           <span className="flex items-center gap-1.5 text-[12.5px] text-[#7c8ea0] font-medium">
             <Clock size={14} weight="duotone" />
             {lesson.estimatedMinutes} min
@@ -93,45 +117,56 @@ export default function LessonDetailPage({
       </div>
 
       <div className="grid md:grid-cols-2 gap-4">
-        {lesson.topics.map((topic, i) => (
-          <motion.div
-            key={topic.slug}
-            initial={{ opacity: 0, y: 12 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: i * 0.05 }}
-          >
-            <Link
-              href={`/topics/${topic.slug}`}
-              className="group flex items-center gap-4 bg-white border rounded-[14px] p-5 shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5"
+        {lesson.topics.map((topic, i) => {
+          const hasContent = !!getTopicBySlug(topic.slug);
+          return (
+            <motion.div
+              key={topic.slug}
+              initial={{ opacity: 0, y: 12 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.05 }}
             >
-              <div className="w-10 h-10 rounded-full bg-[#eef7ff] flex items-center justify-center text-[#007AC3] shrink-0">
-                <CheckCircle size={20} weight="duotone" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <h3 className="text-[14px] font-bold text-[#0c2536] group-hover:text-[#007AC3] transition-colors truncate">
-                  {topic.title}
-                </h3>
-              </div>
-              <ArrowRight
-                size={16}
-                weight="bold"
-                className="text-[#007AC3] opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
-              />
-            </Link>
-          </motion.div>
-        ))}
-      </div>
-
-      <div className="mt-12 bg-white border rounded-[14px] p-6 shadow-sm">
-        <h3 className="text-[15.5px] font-bold text-[#0c2536] mb-2">
-          Topic content coming soon
-        </h3>
-        <p className="text-[13.5px] text-[#46586a]">
-          Each topic above will have detailed notes, hands-on exercises, a
-          challenge, pro tips, common mistakes, and code examples in both
-          Python and TypeScript.
-        </p>
+              {hasContent ? (
+                <Link
+                  href={`/topics/${topic.slug}`}
+                  className="group flex items-center gap-4 bg-white border rounded-[14px] p-5 shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5"
+                >
+                  <div className="w-10 h-10 rounded-full bg-[#eef7ff] flex items-center justify-center text-[#007AC3] shrink-0">
+                    <CheckCircle size={20} weight="duotone" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-[14px] font-bold text-[#0c2536] group-hover:text-[#007AC3] transition-colors truncate">
+                      {topic.title}
+                    </h3>
+                    <div className="text-[11px] font-bold uppercase tracking-wider text-[#85BC20] mt-1">
+                      Ready to read
+                    </div>
+                  </div>
+                  <ArrowRight
+                    size={16}
+                    weight="bold"
+                    className="text-[#007AC3] opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
+                  />
+                </Link>
+              ) : (
+                <div className="flex items-center gap-4 bg-[#f7fbff] border border-dashed rounded-[14px] p-5 opacity-70">
+                  <div className="w-10 h-10 rounded-full bg-[#eef7ff] flex items-center justify-center text-[#7c8ea0] shrink-0">
+                    <Clock size={20} weight="duotone" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-[14px] font-bold text-[#46586a] truncate">
+                      {topic.title}
+                    </h3>
+                    <div className="text-[11px] font-bold uppercase tracking-wider text-[#E8A317] mt-1">
+                      Coming soon
+                    </div>
+                  </div>
+                </div>
+              )}
+            </motion.div>
+          );
+        })}
       </div>
     </div>
   );

@@ -201,9 +201,12 @@ export default function HomePage() {
                 whileHover={{ y: -4 }}
                 className="gradient-border-hover relative bg-gradient-to-br from-[#f7fbff] to-[#eef6fc] dark:from-[#0e2a44] dark:to-[#143550] border border-border rounded-[14px] p-6 shadow-sm hover:shadow-md"
               >
-                <div
-                  className="text-[42px] font-extrabold leading-none mb-3"
-                  style={{ color: `${step.color}25` }}
+              <div
+                  className="text-[42px] font-extrabold leading-none mb-3 transition-all duration-300 group-hover:scale-110"
+                  style={{
+                    color: step.color,
+                    opacity: 0.55,
+                  }}
                 >
                   {step.n}
                 </div>

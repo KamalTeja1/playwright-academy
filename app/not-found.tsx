@@ -5,16 +5,16 @@ export default function NotFound() {
   return (
     <div className="min-h-[70vh] flex items-center justify-center px-6">
       <div className="text-center max-w-md">
-        <div className="w-20 h-20 rounded-full bg-[#eef7ff] flex items-center justify-center text-[#007AC3] mx-auto mb-5">
+        <div className="w-20 h-20 rounded-full bg-blue-25 flex items-center justify-center text-[#007AC3] mx-auto mb-5">
           <Compass size={40} weight="duotone" />
         </div>
-        <div className="text-[64px] font-extrabold text-[#0c2536] leading-none mb-3">
+        <div className="text-[64px] font-extrabold text-ink-900 leading-none mb-3">
           404
         </div>
-        <h1 className="text-[19px] font-extrabold text-[#0c2536] mb-2">
+        <h1 className="text-[19px] font-extrabold text-ink-900 mb-2">
           Aiyo, this page is not here
         </h1>
-        <p className="text-[#46586a] mb-6">
+        <p className="text-ink-600 mb-6">
           The link might be broken, or the page moved somewhere else.
         </p>
         <Link

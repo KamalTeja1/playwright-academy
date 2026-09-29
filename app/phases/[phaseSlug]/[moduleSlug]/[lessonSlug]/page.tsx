@@ -42,10 +42,10 @@ export default function LessonDetailPage({
   if (!phase || !mod || !lesson) {
     return (
       <div className="px-6 md:px-12 py-20 max-w-3xl mx-auto text-center">
-        <h1 className="text-[32px] font-extrabold text-[#0c2536] mb-3">
+        <h1 className="text-[32px] font-extrabold text-ink-900 mb-3">
           Lesson not found
         </h1>
-        <p className="text-[#46586a] mb-6">We couldn't find that lesson.</p>
+        <p className="text-ink-600 mb-6">We couldn't find that lesson.</p>
         <Link
           href="/phases"
           className="inline-flex items-center gap-2 px-6 py-3 rounded-[10px] text-white font-semibold text-[13.5px]"
@@ -68,7 +68,7 @@ export default function LessonDetailPage({
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="text-[14px] text-[#46586a]"
+          className="text-[14px] text-ink-600"
         >
           Opening lesson…
         </motion.div>
@@ -81,38 +81,38 @@ export default function LessonDetailPage({
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
         <Link
           href={`/phases/${phase.slug}/${mod.slug}`}
-          className="inline-flex items-center gap-2 text-[13px] text-[#46586a] hover:text-[#007AC3] font-medium mb-6 transition-colors"
+          className="inline-flex items-center gap-2 text-[13px] text-ink-600 hover:text-[#007AC3] font-medium mb-6 transition-colors"
         >
           <ArrowLeft size={14} weight="bold" />
           {mod.title}
         </Link>
 
-        <div className="text-[12px] uppercase text-[#7c8ea0] tracking-wider font-bold mb-2">
+        <div className="text-[12px] uppercase text-ink-400 tracking-wider font-bold mb-2">
           Lesson
         </div>
-        <h1 className="text-[32px] font-extrabold text-[#0c2536] mb-3">
+        <h1 className="text-[32px] font-extrabold text-ink-900 mb-3">
           {lesson.title}
         </h1>
-        <p className="text-[#46586a] max-w-2xl text-[14.5px] mb-6">
+        <p className="text-ink-600 max-w-2xl text-[14.5px] mb-6">
           {lesson.summary}
         </p>
 
         <div className="flex flex-wrap items-center gap-4 mb-8">
-          <span className="flex items-center gap-1.5 text-[12.5px] text-[#7c8ea0] font-medium">
+          <span className="flex items-center gap-1.5 text-[12.5px] text-ink-400 font-medium">
             <Clock size={14} weight="duotone" />
             {lesson.estimatedMinutes} min
           </span>
-          <span className="flex items-center gap-1.5 text-[12.5px] text-[#7c8ea0] font-medium">
+          <span className="flex items-center gap-1.5 text-[12.5px] text-ink-400 font-medium">
             <Sparkle size={14} weight="duotone" />
             {lesson.topics.length} topics
           </span>
-          <span className="text-[11px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-[6px] bg-[#eef7ff] text-[#007AC3]">
+          <span className="text-[11px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-[6px] bg-blue-25 text-[#007AC3]">
             {lesson.difficulty}
           </span>
         </div>
       </motion.div>
 
-      <div className="mb-6 text-[12px] uppercase text-[#7c8ea0] tracking-wider font-bold">
+      <div className="mb-6 text-[12px] uppercase text-ink-400 tracking-wider font-bold">
         Topics in this lesson
       </div>
 
@@ -130,13 +130,13 @@ export default function LessonDetailPage({
               {hasContent ? (
                 <Link
                   href={`/topics/${topic.slug}`}
-                  className="group flex items-center gap-4 bg-white border rounded-[14px] p-5 shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5"
+                  className="group flex items-center gap-4 bg-surface border rounded-[14px] p-5 shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5"
                 >
-                  <div className="w-10 h-10 rounded-full bg-[#eef7ff] flex items-center justify-center text-[#007AC3] shrink-0">
+                  <div className="w-10 h-10 rounded-full bg-blue-25 flex items-center justify-center text-[#007AC3] shrink-0">
                     <CheckCircle size={20} weight="duotone" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-[14px] font-bold text-[#0c2536] group-hover:text-[#007AC3] transition-colors truncate">
+                    <h3 className="text-[14px] font-bold text-ink-900 group-hover:text-[#007AC3] transition-colors truncate">
                       {topic.title}
                     </h3>
                     <div className="text-[11px] font-bold uppercase tracking-wider text-[#85BC20] mt-1">
@@ -150,12 +150,12 @@ export default function LessonDetailPage({
                   />
                 </Link>
               ) : (
-                <div className="flex items-center gap-4 bg-[#f7fbff] border border-dashed rounded-[14px] p-5 opacity-70">
-                  <div className="w-10 h-10 rounded-full bg-[#eef7ff] flex items-center justify-center text-[#7c8ea0] shrink-0">
+                <div className="flex items-center gap-4 bg-blue-25 border border-dashed rounded-[14px] p-5 opacity-70">
+                  <div className="w-10 h-10 rounded-full bg-blue-25 flex items-center justify-center text-ink-400 shrink-0">
                     <Clock size={20} weight="duotone" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-[14px] font-bold text-[#46586a] truncate">
+                    <h3 className="text-[14px] font-bold text-ink-600 truncate">
                       {topic.title}
                     </h3>
                     <div className="text-[11px] font-bold uppercase tracking-wider text-[#E8A317] mt-1">

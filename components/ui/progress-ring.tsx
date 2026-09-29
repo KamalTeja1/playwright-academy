@@ -53,7 +53,7 @@ export function ProgressRing({
       </svg>
       {showLabel && (
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-[13px] font-extrabold text-[#0c2536]">
+          <span className="text-[13px] font-extrabold text-ink-900">
             {Math.round(value)}%
           </span>
         </div>

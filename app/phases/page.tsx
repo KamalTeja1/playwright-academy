@@ -125,13 +125,13 @@ export default function PhasesPage() {
         animate={{ opacity: 1, y: 0 }}
         className="mb-10"
       >
-        <div className="text-[12px] uppercase text-[#7c8ea0] tracking-wider font-bold mb-2">
+        <div className="text-[12px] uppercase text-ink-400 tracking-wider font-bold mb-2">
           Learning Path
         </div>
-        <h1 className="text-[32px] font-extrabold text-[#0c2536] mb-3">
+        <h1 className="text-[32px] font-extrabold text-ink-900 mb-3">
           All Phases
         </h1>
-        <p className="text-[#46586a] max-w-2xl text-[14.5px]">
+        <p className="text-ink-600 max-w-2xl text-[14.5px]">
           From "what is code?" to a full-fledged Playwright framework. Follow
           the phases in order, or jump to what you need. Every topic has notes,
           hands-on practice, and a challenge.

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { motion } from "framer-motion";
 import { ThemeToggle } from "./theme-toggle";
 
 export function TopBar() {
@@ -9,9 +10,12 @@ export function TopBar() {
   const crumbs = pathname.split("/").filter(Boolean);
 
   return (
-    <header className="sticky top-0 z-30 h-16 bg-white/85 backdrop-blur-md border-b flex items-center px-6 gap-4">
-      <nav className="flex-1 flex items-center gap-2 text-[13px] text-[#7c8ea0] truncate">
-        <Link href="/" className="hover:text-[#007AC3] font-medium">
+    <header className="sticky top-0 z-30 h-16 bg-surface/85 dark:bg-[#0e2a44]/85 backdrop-blur-md border-b border-border flex items-center px-6 gap-4">
+      <nav className="flex-1 flex items-center gap-2 text-[13px] text-ink-400 truncate">
+        <Link
+          href="/"
+          className="hover:text-[#007AC3] font-medium transition-colors"
+        >
           Home
         </Link>
         {crumbs.map((crumb, i) => {
@@ -20,10 +24,18 @@ export function TopBar() {
           const label = crumb.charAt(0).toUpperCase() + crumb.slice(1);
 
           return (
-            <span key={href} className="flex items-center gap-2">
-              <span className="text-[#7c8ea0]/60">/</span>
+            <motion.span
+              key={href}
+              initial={{ opacity: 0, x: -4 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: i * 0.05 }}
+              className="flex items-center gap-2"
+            >
+              <span className="text-ink-400/40 text-[10px]">●</span>
               {isLast ? (
-                <span className="text-[#0c2536] font-semibold">{label}</span>
+                <span className="text-ink-900 font-semibold">
+                  {label}
+                </span>
               ) : (
                 <Link
                   href={href}
@@ -32,7 +44,7 @@ export function TopBar() {
                   {label}
                 </Link>
               )}
-            </span>
+            </motion.span>
           );
         })}
       </nav>

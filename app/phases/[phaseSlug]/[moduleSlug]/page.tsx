@@ -32,10 +32,10 @@ export default function ModuleDetailPage({
   if (!phase || !mod) {
     return (
       <div className="px-6 md:px-12 py-20 max-w-3xl mx-auto text-center">
-        <h1 className="text-[32px] font-extrabold text-[#0c2536] mb-3">
+        <h1 className="text-[32px] font-extrabold text-ink-900 mb-3">
           Module not found
         </h1>
-        <p className="text-[#46586a] mb-6">
+        <p className="text-ink-600 mb-6">
           We couldn't find that module.
         </p>
         <Link
@@ -58,26 +58,26 @@ export default function ModuleDetailPage({
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
         <Link
           href={`/phases/${phase.slug}`}
-          className="inline-flex items-center gap-2 text-[13px] text-[#46586a] hover:text-[#007AC3] font-medium mb-6 transition-colors"
+          className="inline-flex items-center gap-2 text-[13px] text-ink-600 hover:text-[#007AC3] font-medium mb-6 transition-colors"
         >
           <ArrowLeft size={14} weight="bold" />
           Phase {phase.number} · {phase.title}
         </Link>
 
-        <div className="text-[12px] uppercase text-[#7c8ea0] tracking-wider font-bold mb-2">
+        <div className="text-[12px] uppercase text-ink-400 tracking-wider font-bold mb-2">
           Module
         </div>
-        <h1 className="text-[32px] font-extrabold text-[#0c2536] mb-3">
+        <h1 className="text-[32px] font-extrabold text-ink-900 mb-3">
           {mod.title}
         </h1>
-        <p className="text-[#46586a] max-w-2xl text-[14.5px] mb-10">
+        <p className="text-ink-600 max-w-2xl text-[14.5px] mb-10">
           {mod.description}
         </p>
       </motion.div>
 
       {lessons && lessons.length > 0 ? (
         <>
-          <div className="mb-6 flex items-center gap-2 text-[12px] uppercase text-[#7c8ea0] tracking-wider font-bold">
+          <div className="mb-6 flex items-center gap-2 text-[12px] uppercase text-ink-400 tracking-wider font-bold">
             <BookOpen size={14} weight="duotone" />
             <span>{lessons.length} lessons</span>
           </div>
@@ -95,7 +95,7 @@ export default function ModuleDetailPage({
                 >
                   <Link
                     href={`/phases/${phase.slug}/${mod.slug}/${lesson.slug}`}
-                    className="group block bg-white border rounded-[14px] p-6 shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5"
+                    className="group block bg-surface border rounded-[14px] p-6 shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5"
                   >
                     <div className="flex items-start justify-between gap-4 mb-3">
                       <div className="flex-1">
@@ -106,23 +106,23 @@ export default function ModuleDetailPage({
                           >
                             {lesson.difficulty}
                           </span>
-                          <span className="flex items-center gap-1 text-[12px] text-[#7c8ea0] font-medium">
+                          <span className="flex items-center gap-1 text-[12px] text-ink-400 font-medium">
                             <Clock size={13} weight="duotone" />
                             {lesson.estimatedMinutes} min
                           </span>
-                          <span className="flex items-center gap-1 text-[12px] text-[#7c8ea0] font-medium">
+                          <span className="flex items-center gap-1 text-[12px] text-ink-400 font-medium">
                             <Sparkle size={13} weight="duotone" />
                             {lesson.topics.length} topics
                           </span>
                         </div>
-                        <h3 className="text-[15.5px] font-bold text-[#0c2536] group-hover:text-[#007AC3] transition-colors mb-1">
+                        <h3 className="text-[15.5px] font-bold text-ink-900 group-hover:text-[#007AC3] transition-colors mb-1">
                           {lesson.title}
                         </h3>
-                        <p className="text-[13px] text-[#46586a] leading-relaxed">
+                        <p className="text-[13px] text-ink-600 leading-relaxed">
                           {lesson.summary}
                         </p>
                       </div>
-                      <div className="w-9 h-9 rounded-full bg-[#eef7ff] flex items-center justify-center text-[#007AC3] opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+                      <div className="w-9 h-9 rounded-full bg-blue-25 flex items-center justify-center text-[#007AC3] opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
                         <ArrowRight size={16} weight="bold" />
                       </div>
                     </div>
@@ -133,14 +133,14 @@ export default function ModuleDetailPage({
           </div>
         </>
       ) : (
-        <div className="bg-white border rounded-[14px] p-10 text-center shadow-sm">
-          <div className="w-16 h-16 rounded-full bg-[#eef7ff] flex items-center justify-center text-[#007AC3] mx-auto mb-4">
+        <div className="bg-surface border rounded-[14px] p-10 text-center shadow-sm">
+          <div className="w-16 h-16 rounded-full bg-blue-25 flex items-center justify-center text-[#007AC3] mx-auto mb-4">
             <BookOpen size={32} weight="duotone" />
           </div>
-          <h3 className="text-[19px] font-extrabold text-[#0c2536] mb-2">
+          <h3 className="text-[19px] font-extrabold text-ink-900 mb-2">
             Lessons coming soon
           </h3>
-          <p className="text-[#46586a] max-w-md mx-auto">
+          <p className="text-ink-600 max-w-md mx-auto">
             This module has {mod.lessonCount} lessons planned. Content will be
             added soon.
           </p>

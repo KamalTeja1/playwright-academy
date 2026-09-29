@@ -18,6 +18,7 @@ import {
   CheckCircle,
 } from "@phosphor-icons/react/dist/ssr";
 import { getTopicBySlug } from "@/lib/data/topics";
+import { CompleteButton } from "@/components/ui/complete-button";
 
 type TabKey = "notes" | "handsOn" | "challenge" | "proTips" | "mistakes" | "code";
 
@@ -82,14 +83,17 @@ const [activeTab, setActiveTab] = useState<TabKey>("notes");
           {topic.title}
         </h1>
 
-        <div className="flex flex-wrap items-center gap-3 mb-6">
-          <span className="flex items-center gap-1.5 text-[12.5px] text-ink-400 font-medium">
-            <Clock size={14} weight="duotone" />
-            {topic.estimatedMinutes} min
-          </span>
-          <span className="text-[11px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-[6px] bg-blue-25 text-[#007AC3]">
-            {topic.difficulty}
-          </span>
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="flex items-center gap-1.5 text-[12.5px] text-ink-400 font-medium">
+              <Clock size={14} weight="duotone" />
+              {topic.estimatedMinutes} min
+            </span>
+            <span className="text-[11px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-[6px] bg-blue-25 text-[#007AC3]">
+              {topic.difficulty}
+            </span>
+          </div>
+          <CompleteButton topicSlug={topicSlug} />
         </div>
 
         <div className="bg-blue-25 border border-[#A6D1EA] rounded-[14px] p-5 mb-8">

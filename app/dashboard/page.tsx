@@ -15,6 +15,7 @@ import {
 } from "@phosphor-icons/react/dist/ssr";
 import { ProgressRing } from "@/components/ui/progress-ring";
 import { useProgress, calculateStreak } from "@/lib/store/progress";
+import { useProfile } from "@/lib/store/profile";
 import { getTopicLocation } from "@/lib/data/lookup";
 import { topics } from "@/lib/data/topics";
 
@@ -34,6 +35,7 @@ const PHASE_LABELS: Record<string, { num: string; title: string }> = {
 export default function DashboardPage() {
   const [mounted, setMounted] = useState(false);
   const completed = useProgress((s) => s.completed);
+  const profileName = useProfile((s) => s.name);
 
   useEffect(() => {
     setMounted(true);
@@ -92,7 +94,7 @@ export default function DashboardPage() {
           Dashboard
         </div>
         <h1 className="text-[32px] font-extrabold text-ink-900 mb-2">
-          Welcome back 👋
+          Welcome back{profileName ? ", " + profileName : ""} 👋
         </h1>
         <p className="text-ink-600">
           Here is where you are on your Playwright journey.

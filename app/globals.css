@@ -1,26 +1,106 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  /* Blues */
+  --color-blue-375: #409BD2;
+  --color-blue-175: #A6D1EA;
+  --color-blue-500: #007AC3;
+  --color-blue-25: #eef7ff;
+
+  /* Greens */
+  --color-green-500: #85BC20;
+  --color-green-100: #eef6dc;
+
+  /* Reds */
+  --color-red-500: #E5202E;
+  --color-red-100: #fdeced;
+
+  /* Amber */
+  --color-amber-500: #E8A317;
+  --color-amber-100: #fdf3dd;
+
+  /* Ink (text colors) */
+  --color-ink-900: #0c2536;
+  --color-ink-600: #46586a;
+  --color-ink-400: #7c8ea0;
+
+  /* Backgrounds & borders */
+  --color-bg: #eef4f9;
+  --color-surface: #ffffff;
+  --color-border: #e4edf5;
+
+  /* Fonts */
+  --font-sans: var(--font-fira-sans), system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), monospace;
+
+  /* Border radius */
+  --radius-card: 14px;
+  --radius-btn: 10px;
+  --radius-modal: 16px;
+  --radius-badge: 20px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 4px rgba(12, 37, 54, 0.06);
+  --shadow-md: 0 6px 20px rgba(12, 37, 54, 0.10);
+  --shadow-lg: 0 16px 40px rgba(12, 37, 54, 0.16);
+  --shadow-btn: 0 6px 18px rgba(0, 122, 195, 0.30);
+  --shadow-btn-hover: 0 10px 24px rgba(0, 122, 195, 0.38);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+/* Base styles */
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: #eef4f9;
+  color: #0c2536;
+  font-family: var(--font-fira-sans), system-ui, sans-serif;
+  background-image: radial-gradient(
+      1200px 500px at 10% -10%,
+      #dcefff 0%,
+      transparent 60%
+    ),
+    radial-gradient(1000px 460px at 100% 0%, #e3f4d0 0%, transparent 55%);
+  background-attachment: fixed;
+  min-height: 100vh;
+}
+
+/* Focus ring */
+*:focus-visible {
+  outline: 2px solid #007AC3;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #eef4f9;
+}
+::-webkit-scrollbar-thumb {
+  background: #d5e4ee;
+  border-radius: 6px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #409BD2;
+}
+
+/* Custom utility classes */
+.bg-gradient-btn {
+  background-image: linear-gradient(120deg, #007AC3, #409BD2);
+}
+.bg-gradient-hero {
+  background-image: linear-gradient(
+    125deg,
+    #005c95 0%,
+    #007AC3 40%,
+    #409BD2 75%,
+    #85BC20 140%
+  );
+}
+.shadow-btn {
+  box-shadow: 0 6px 18px rgba(0, 122, 195, 0.30);
+}
+.shadow-btn-hover:hover {
+  box-shadow: 0 10px 24px rgba(0, 122, 195, 0.38);
 }

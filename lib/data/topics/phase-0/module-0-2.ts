@@ -2193,4 +2193,2196 @@ page.locator("[data-testid='login-btn']")`,
     estimatedMinutes: 35,
     tags: ["css", "selectors", "locators", "web-fundamentals"],
   },
+    "xpath-absolute-vs-relative": {
+    slug: "xpath-absolute-vs-relative",
+    title: "XPath: Absolute vs Relative",
+    summary:
+      "Understand two XPath styles, why one is fragile, and how to read the other.",
+    whyItMatters:
+      "You may see XPath in old test suites, browser tools, and job interviews. You need to recognise fragile XPath before it creates flaky tests.",
+    notes: `**XPath** is a language for finding elements in an HTML or XML document. CSS selectors are more common in modern web testing, but XPath still appears in older projects.
+
+Think of XPath like giving directions to a chai shop.
+
+An **absolute XPath** says: start at the country, then state, city, lane, building, floor, shop, and counter.
+
+A **relative XPath** says: find the chai shop with this name, then find its counter.
+
+Both can reach the same place. But if the building gets one new floor, the first direction becomes wrong. The second still works.
+
+### Absolute XPath
+
+An absolute XPath starts from the root of the document. It usually begins with one forward slash.
+
+~~~text
+/html/body/div[1]/main/form/div[2]/input
+~~~
+
+Read it from left to right:
+
+- Start at the html element
+- Go to body
+- Go to the first div
+- Go to main
+- Go to form
+- Go to the second div
+- Find its input
+
+Browser DevTools often gives you this when you choose Copy full XPath.
+
+It looks precise. But it is usually a bad locator.
+
+Imagine a developer adds one banner near the top of the page:
+
+~~~html
+<body>
+  <div class="cookie-banner">Cookies</div>
+  <div id="app">
+    ...
+  </div>
+</body>
+~~~
+
+Now the app container may become the second div instead of the first div. Your absolute XPath points somewhere else, even though the email input itself did not change.
+
+This is why absolute XPath is fragile.
+
+### Relative XPath
+
+A relative XPath starts from a useful point instead of the document root. It usually begins with two forward slashes.
+
+~~~text
+//input[@name="email"]
+~~~
+
+This means:
+
+- Find an input element
+- Whose name attribute equals email
+- It can exist anywhere in the page
+
+Here is another example:
+
+~~~text
+//button[normalize-space()="Log in"]
+~~~
+
+This means:
+
+- Find a button
+- Whose visible text, after removing extra spaces, is Log in
+
+Relative XPath depends on meaningful information: a tag, an attribute, visible text, or nearby structure. It is much more likely to survive harmless layout changes.
+
+### A comparison
+
+Suppose the page contains this:
+
+~~~html
+<form>
+  <label for="email">Email</label>
+  <input id="email" name="email" type="email" />
+
+  <button type="submit">Log in</button>
+</form>
+~~~
+
+Here are three ways to find the input:
+
+~~~text
+/html/body/div[1]/main/form/div[2]/input
+//input[@name="email"]
+//input[@id="email"]
+~~~
+
+The first one depends on the whole page layout. The last two depend on details of the input itself.
+
+For a Playwright test, you would normally prefer an even clearer locator:
+
+~~~python
+page.get_by_label("Email")
+~~~
+
+That locator explains what the user sees. It also checks that the page is accessible.
+
+### One slash vs two slashes
+
+This is the small rule that confuses many beginners:
+
+- One slash at the beginning means start from the document root.
+- Two slashes means search for matching elements from the current context.
+
+For example:
+
+~~~text
+/html/body
+//button
+~~~
+
+The first expression follows an exact path. The second expression searches for buttons.
+
+Inside a selected container, two slashes search below that container. For example, if you are already looking inside a login form, you can search for a button within it.
+
+### When will you see absolute XPath?
+
+You may see it in:
+
+- Old Selenium projects
+- Browser DevTools copy options
+- Quick experiments during debugging
+- Code written by someone in a hurry
+- Interview questions about locator stability
+
+Knowing it is useful. Using it as your normal locator strategy is not.
+
+### The simple rule
+
+If your XPath contains many numbered steps like div[1], div[2], and span[3], stop and inspect the page again.
+
+Look for:
+
+- A role and accessible name
+- A label
+- A test ID
+- A stable attribute
+- A short CSS selector
+
+A locator should describe the element's meaning, not the entire path the browser took to reach it.`,
+    handsOn: `Let's compare a fragile XPath with a stable one.
+
+### Step 1: Create a practice page
+
+Create a file called xpath-paths.html in your html-practice folder.
+
+~~~html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>XPath Paths</title>
+  </head>
+  <body>
+    <main>
+      <form>
+        <div>
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" />
+        </div>
+
+        <div>
+          <label for="password">Password</label>
+          <input id="password" name="password" type="password" />
+        </div>
+
+        <button type="submit">Log in</button>
+      </form>
+    </main>
+  </body>
+</html>
+~~~
+
+Open the file in your browser.
+
+### Step 2: Inspect the email input
+
+Right-click the email field and choose Inspect.
+
+In the Elements panel, right-click the input element. Chrome may show options such as Copy XPath and Copy full XPath.
+
+Copy both into a notes file. You may see something similar to these:
+
+~~~text
+Full XPath: /html/body/main/form/div[1]/input
+XPath: //*[@id="email"]
+~~~
+
+Your exact result can differ. That is okay.
+
+### Step 3: Test both in the DevTools console
+
+Open the Console tab and run:
+
+~~~javascript
+$x("/html/body/main/form/div[1]/input")
+$x("//input[@name='email']")
+~~~
+
+Both should return the email input in an array.
+
+The dollar-x helper is a DevTools shortcut for testing XPath. It is useful for learning. It is not Playwright code.
+
+### Step 4: Break the absolute XPath
+
+Add this line just inside the body, above main:
+
+~~~html
+<div>Welcome banner</div>
+~~~
+
+Save and refresh.
+
+Run the two XPath expressions again. The absolute path may now fail or point to the wrong element. The relative XPath using the name attribute should still work.
+
+### Step 5: Write the Playwright version
+
+For this page, write the locator you would actually prefer:
+
+~~~python
+page.get_by_label("Email")
+~~~
+
+### Deliverable
+
+You tested one absolute XPath and one relative XPath. Then you changed the page layout and saw why the relative locator is safer.`,
+    challenge: `Create a small checkout form with these fields:
+
+- Full name
+- Delivery address
+- Pincode
+- Place order button
+
+Give every input a meaningful label and a meaningful name attribute.
+
+Then write three locator options for the pincode input:
+
+1. One absolute XPath from DevTools
+2. One relative XPath using an attribute
+3. One Playwright locator you would actually use
+
+Use this shape for your answer:
+
+~~~text
+Absolute XPath:
+...
+
+Relative XPath:
+...
+
+Preferred Playwright locator:
+...
+~~~
+
+Now add a new div above the form. Check which locator still works.
+
+Your goal is not to memorise XPath. Your goal is to notice when a locator depends on layout instead of meaning.`,
+    proTips: [
+      "If DevTools gives you a long XPath with many numbered div elements, treat it as a warning sign.",
+      "A relative XPath using a stable attribute is safer than an absolute XPath, but Playwright role and label locators are usually better.",
+      "Use the DevTools `$x()` helper to experiment with XPath before putting it into an old test suite.",
+      "A locator should survive a designer moving cards around on the page.",
+      "Ask yourself: does this locator describe the user-facing element, or only the current HTML layout?",
+    ],
+    commonMistakes: [
+      {
+        mistake: "Copying full XPath from DevTools and using it directly in a test",
+        fix: "DevTools creates a path based on the current layout. Replace it with a role, label, test ID, stable CSS selector, or short relative XPath.",
+      },
+      {
+        mistake: "Thinking two slashes always mean a better locator",
+        fix: "Relative XPath is less fragile than absolute XPath, but it can still be vague. Add a meaningful attribute or nearby text.",
+      },
+      {
+        mistake: "Using numbered div positions as the main identity of an element",
+        fix: "Positions change when a banner, error message, or new component is added. Prefer meaningful attributes such as name or data-testid.",
+      },
+      {
+        mistake: "Using XPath when a label exists",
+        fix: "For a labelled input, use Playwright's get_by_label. It is clearer and also checks accessibility.",
+      },
+      {
+        mistake: "Assuming the copied XPath is identical across browsers",
+        fix: "Browser tools can produce slightly different paths. Tests should not depend on tool-generated structure.",
+      },
+    ],
+    codeExamples: [
+      {
+        language: "text",
+        title: "Absolute XPath — fragile",
+        code: `/html/body/div[1]/main/form/div[2]/input`,
+      },
+      {
+        language: "text",
+        title: "Relative XPath — based on a meaningful attribute",
+        code: `//input[@name="email"]`,
+      },
+      {
+        language: "python",
+        title: "The preferred Playwright locator for a labelled field",
+        code: `page.get_by_label("Email")`,
+      },
+    ],
+    furtherReading: [
+      {
+        title: "MDN — Introduction to XPath",
+        url: "https://developer.mozilla.org/en-US/docs/Web/XPath/Introduction_to_using_XPath_in_JavaScript",
+      },
+      {
+        title: "Playwright — Locator best practices",
+        url: "https://playwright.dev/python/docs/locators",
+      },
+    ],
+    difficulty: "Beginner",
+    estimatedMinutes: 30,
+    tags: ["xpath", "locators", "web-fundamentals", "playwright"],
+  },
+    "xpath-predicates": {
+    slug: "xpath-predicates",
+    title: "XPath Predicates",
+    summary:
+      "Use square brackets to narrow an XPath locator by attribute, text, position, or condition.",
+    whyItMatters:
+      "Predicates turn a broad XPath into a specific one. They help you understand older test suites, even though Playwright locators are usually clearer.",
+    notes: `An XPath **predicate** is a condition inside square brackets. It filters a list of matching elements.
+
+Think of it like ordering biryani on Swiggy. First, you search for restaurants. Then you add filters: vegetarian, rating above 4, delivery under 30 minutes.
+
+XPath works in the same way.
+
+Without a predicate, this XPath finds every input on a page:
+
+~~~text
+//input
+~~~
+
+With a predicate, you can narrow it down:
+
+~~~text
+//input[@name="email"]
+~~~
+
+Now XPath finds only input elements whose name attribute is email.
+
+### The square bracket pattern
+
+Most predicates look like this:
+
+~~~text
+//tag[condition]
+~~~
+
+The tag tells XPath what kind of element to look for. The condition tells it which matching element you want.
+
+For example:
+
+~~~text
+//button[@type="submit"]
+~~~
+
+Read it in plain English:
+
+- Find button elements
+- Keep only buttons
+- Where the type attribute is submit
+
+### Attribute predicates
+
+Attributes are the most common way to filter XPath.
+
+~~~html
+<input name="email" type="email" />
+<input name="password" type="password" />
+<button data-testid="login-submit">Log in</button>
+~~~
+
+You can target them like this:
+
+~~~text
+//input[@name="email"]
+//input[@type="password"]
+//button[@data-testid="login-submit"]
+~~~
+
+The at symbol means attribute.
+
+So this:
+
+~~~text
+[@name="email"]
+~~~
+
+means: where the name attribute equals email.
+
+### Text predicates
+
+You can also match visible text.
+
+~~~html
+<button>Save changes</button>
+<button>Cancel</button>
+~~~
+
+XPath can find the Save changes button:
+
+~~~text
+//button[text()="Save changes"]
+~~~
+
+This works when the text is simple and has no extra spaces.
+
+Real pages often contain spaces or line breaks because of formatting. In that case, use normalize-space:
+
+~~~text
+//button[normalize-space()="Save changes"]
+~~~
+
+Normalize-space removes extra spaces before, after, and between words. It is safer for visible text matching.
+
+### Contains predicates
+
+Sometimes you know only part of an attribute or text.
+
+~~~html
+<button class="btn btn-primary">Continue to payment</button>
+<a href="/products/keyboard">Keyboard</a>
+~~~
+
+Use contains:
+
+~~~text
+//button[contains(@class, "btn-primary")]
+//a[contains(@href, "/products/")]
+//button[contains(normalize-space(), "payment")]
+~~~
+
+This is useful, but do not make it too broad. A page may have several links containing products or several buttons containing payment.
+
+### Position predicates
+
+You can select an item by position.
+
+~~~html
+<ul>
+  <li>Python</li>
+  <li>TypeScript</li>
+  <li>Playwright</li>
+</ul>
+~~~
+
+Examples:
+
+~~~text
+//li[1]
+//li[2]
+//li[last()]
+~~~
+
+These mean first list item, second list item, and last list item.
+
+Position-based XPath is risky for test automation. If someone adds a new item at the top, the second item becomes the third.
+
+It is like saying, 'click the second shop on this street'. That works only until a new shop opens.
+
+Use position only when order is genuinely part of the behaviour you are testing. For example, checking that the first search result is the sponsored one.
+
+### Multiple conditions
+
+You can join conditions with and or or.
+
+~~~text
+//input[@type="email" and @required]
+//button[@type="submit" and not(@disabled)]
+//a[@href="/home" or @href="/dashboard"]
+~~~
+
+The first example finds a required email input.
+
+The second finds a submit button that is not disabled.
+
+The third finds a link going to either home or dashboard.
+
+### A useful form example
+
+Suppose your login form looks like this:
+
+~~~html
+<form>
+  <input name="email" type="email" />
+  <input name="password" type="password" />
+  <button type="submit">Log in</button>
+</form>
+~~~
+
+Possible XPath locators are:
+
+~~~text
+//input[@name="email"]
+//input[@type="password"]
+//button[normalize-space()="Log in"]
+~~~
+
+But the Playwright versions are clearer:
+
+~~~python
+page.get_by_label("Email")
+page.get_by_label("Password")
+page.get_by_role("button", name="Log in")
+~~~
+
+The XPath helps you read old code. The Playwright locator is what you should reach for first in new code.
+
+### The simple rule
+
+A good predicate uses a stable fact about the element:
+
+- Meaningful name attribute
+- Test ID
+- Accessible label
+- Clear visible text
+- Stable state such as disabled
+
+A weak predicate depends on temporary layout, generated classes, or a changing position in a list.`,
+    handsOn: `Let's use predicates in the browser console.
+
+### Step 1: Create a page
+
+Create a file named xpath-predicates.html in your html-practice folder.
+
+~~~html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>XPath Predicate Practice</title>
+  </head>
+  <body>
+    <h1>Account settings</h1>
+
+    <form>
+      <label for="email">Email</label>
+      <input id="email" name="email" type="email" required />
+
+      <label for="phone">Phone</label>
+      <input id="phone" name="phone" type="tel" />
+
+      <label for="password">Password</label>
+      <input id="password" name="password" type="password" required />
+
+      <button type="button">Cancel</button>
+      <button type="submit" data-testid="save-profile">
+        Save changes
+      </button>
+    </form>
+
+    <ul>
+      <li>Profile</li>
+      <li>Security</li>
+      <li>Notifications</li>
+    </ul>
+  </body>
+</html>
+~~~
+
+Open the page in your browser and then open DevTools.
+
+### Step 2: Test attribute predicates
+
+In the Console tab, run each expression:
+
+~~~javascript
+$x("//input[@name='email']")
+$x("//input[@type='password']")
+$x("//button[@data-testid='save-profile']")
+~~~
+
+Each command should return one matching element in an array.
+
+### Step 3: Test text predicates
+
+Run:
+
+~~~javascript
+$x("//button[normalize-space()='Save changes']")
+$x("//button[contains(normalize-space(), 'Save')]")
+~~~
+
+Both should find the Save changes button.
+
+### Step 4: Test position predicates
+
+Run:
+
+~~~javascript
+$x("//li[1]")
+$x("//li[2]")
+$x("//li[last()]")
+~~~
+
+Inspect the returned elements. The first is Profile, the second is Security, and the last is Notifications.
+
+### Step 5: Write Playwright alternatives
+
+For the email field and save button, write the locators you would prefer in Playwright:
+
+~~~python
+page.get_by_label("Email")
+page.get_by_role("button", name="Save changes")
+~~~
+
+### Deliverable
+
+You tested XPath predicates for attributes, text, partial text, and list position. You also wrote clearer Playwright alternatives for two elements.`,
+    challenge: `Build a simple product list with three cards.
+
+Each card should have:
+
+- Product name
+- Price
+- Add to cart button
+- A data-product-id attribute
+
+Use any three products you like. A notebook, headphones, and a cricket bat are good examples.
+
+Then write XPath expressions for:
+
+1. The button inside the product card with data-product-id equal to notebook
+2. The product whose name contains Headphones
+3. The first Add to cart button
+4. The last product card
+5. Every button that is not disabled
+
+Finally, write the Playwright locator you would prefer for the Add to cart button on the notebook card.
+
+Hint: use a card locator first, then locate the button inside it. That is easier to read than one giant XPath.
+
+Your goal is to practise filtering. Do not worry if your first XPath is long. Make it clearer one condition at a time.`,
+    proTips: [
+      "Use stable attributes in predicates, especially data-testid, name, and meaningful IDs.",
+      "Use normalize-space when matching button text because formatted HTML often adds invisible spaces.",
+      "Avoid position predicates such as li[2] unless the position itself is important to the test.",
+      "Keep each predicate focused. A short locator with one clear condition is easier to debug.",
+      "When an XPath gets too clever, pause and check whether a Playwright role, label, or test ID locator is simpler.",
+    ],
+    commonMistakes: [
+      {
+        mistake: "Using text() when a button contains nested markup",
+        fix: "Use normalize-space() or contains(normalize-space(), ...) because text may be split across child elements.",
+      },
+      {
+        mistake: "Relying on the second or third element in a changing list",
+        fix: "Use a stable name, ID, or test ID instead. Positions move when the page changes.",
+      },
+      {
+        mistake: "Writing a contains condition that matches too many elements",
+        fix: "Make the text or attribute condition more specific, or narrow the search to a parent container.",
+      },
+      {
+        mistake: "Using a generated CSS class in an XPath predicate",
+        fix: "Generated classes can change on every build. Prefer a meaningful attribute or visible accessible name.",
+      },
+      {
+        mistake: "Using XPath for a simple labelled form field",
+        fix: "Use get_by_label in Playwright. It is shorter, clearer, and more accessible.",
+      },
+    ],
+    codeExamples: [
+      {
+        language: "text",
+        title: "Common XPath predicate patterns",
+        code: `//input[@name="email"]
+//button[@type="submit"]
+//button[normalize-space()="Save"]
+//a[contains(@href, "/products/")]
+//li[last()]`,
+      },
+      {
+        language: "text",
+        title: "Multiple conditions in one predicate",
+        code: `//input[@type="email" and @required]
+//button[@type="submit" and not(@disabled)]
+//a[@href="/home" or @href="/dashboard"]`,
+      },
+      {
+        language: "python",
+        title: "Preferred Playwright alternatives",
+        code: `page.get_by_label("Email")
+page.get_by_role("button", name="Save changes")
+page.get_by_test_id("save-profile")`,
+      },
+    ],
+    furtherReading: [
+      {
+        title: "MDN — XPath syntax",
+        url: "https://developer.mozilla.org/en-US/docs/Web/XPath/Introduction_to_using_XPath_in_JavaScript",
+      },
+      {
+        title: "Playwright — Locators",
+        url: "https://playwright.dev/python/docs/locators",
+      },
+    ],
+    difficulty: "Beginner",
+    estimatedMinutes: 30,
+    tags: ["xpath", "predicates", "locators", "web-fundamentals"],
+  },
+    "xpath-axes": {
+    slug: "xpath-axes",
+    title: "XPath Axes",
+    summary:
+      "Move through the page structure using parent, child, sibling, ancestor, and descendant relationships.",
+    whyItMatters:
+      "XPath axes help you read older locator code where an element must be found through its relationship with another element.",
+    notes: `XPath axes describe the **relationship between elements**.
+
+So far, you have found elements by tag, attribute, text, and position. Axes let you say things like:
+
+- Find the parent of this button
+- Find the label before this input
+- Find the button inside this product card
+- Find a row containing a particular email address
+
+Think of a family wedding photo. You may not know every person's name, but you can say, 'find the parent of this child' or 'find the sibling standing next to her'.
+
+The page DOM is also a tree. Every element can have parents, children, siblings, ancestors, and descendants.
+
+### The DOM tree idea
+
+Look at this small form:
+
+~~~html
+<form>
+  <div class="field">
+    <label for="email">Email</label>
+    <input id="email" name="email" type="email" />
+  </div>
+
+  <button type="submit">Log in</button>
+</form>
+~~~
+
+The relationships are:
+
+- The form is the parent of the field div and button
+- The field div is the parent of label and input
+- The label and input are siblings
+- The form is an ancestor of the input
+- The input is a descendant of the form
+
+XPath axes let you travel through these relationships.
+
+### child::
+
+The child axis finds direct children.
+
+~~~text
+//form/child::button
+~~~
+
+This means:
+
+- Find a form
+- Find its direct child button
+
+You will often see a shorter version:
+
+~~~text
+//form/button
+~~~
+
+Both describe the same direct child relationship.
+
+### parent::
+
+The parent axis moves one level upward.
+
+~~~text
+//input[@name="email"]/parent::div
+~~~
+
+This means:
+
+- Find the email input
+- Move to its parent div
+
+This can be useful when the input has no useful locator but its wrapper has a stable class or test ID.
+
+Be careful though. Parent structure can change during a redesign. A developer may add one extra wrapper div, and your locator stops working.
+
+### ancestor::
+
+An ancestor is any parent, grandparent, or higher container.
+
+~~~text
+//input[@name="email"]/ancestor::form
+~~~
+
+This finds the form that contains the email input.
+
+A practical example is a table row:
+
+~~~html
+<tr>
+  <td>ravi@example.com</td>
+  <td>Active</td>
+  <td><button>Deactivate</button></td>
+</tr>
+~~~
+
+You can find the row containing Ravi's email:
+
+~~~text
+//td[normalize-space()="ravi@example.com"]/ancestor::tr
+~~~
+
+Then find the Deactivate button inside that row:
+
+~~~text
+//td[normalize-space()="ravi@example.com"]/ancestor::tr//button[normalize-space()="Deactivate"]
+~~~
+
+This is powerful. It is also starting to become difficult to read.
+
+In Playwright, a locator chain is usually clearer:
+
+~~~python
+row = page.get_by_role("row").filter(has_text="ravi@example.com")
+row.get_by_role("button", name="Deactivate").click()
+~~~
+
+### descendant::
+
+A descendant is any element nested somewhere below another element.
+
+~~~text
+//form/descendant::input
+~~~
+
+This finds every input inside the form, even if inputs sit inside several wrapper div elements.
+
+The shorter XPath below usually does the same thing:
+
+~~~text
+//form//input
+~~~
+
+Two slashes between form and input mean: find input anywhere below this form.
+
+### following-sibling::
+
+A following sibling is an element at the same level that comes after the current element.
+
+~~~html
+<label>Email</label>
+<input type="email" />
+~~~
+
+You can find the input after the label:
+
+~~~text
+//label[normalize-space()="Email"]/following-sibling::input
+~~~
+
+This can be useful when the label has text but the input has no ID or name.
+
+Still, in new Playwright tests, use the label directly:
+
+~~~python
+page.get_by_label("Email")
+~~~
+
+### preceding-sibling::
+
+A preceding sibling is an element at the same level that comes before the current element.
+
+~~~text
+//input[@type="email"]/preceding-sibling::label
+~~~
+
+This finds the label before an email input.
+
+You will use this less often in tests. It is mainly useful for understanding the page while debugging.
+
+### following:: and preceding::
+
+These axes search more broadly through the document, not just siblings.
+
+~~~text
+//h2[normalize-space()="Billing"]/following::button[1]
+~~~
+
+This means: find the first button appearing anywhere after the Billing heading.
+
+It may work today, but it is risky. Someone can add another button between the heading and the intended button.
+
+Use broad axes only when you truly understand the page structure and cannot use a more meaningful locator.
+
+### The practical rule
+
+Axes are useful for **reading and repairing old XPath**. They are not your first choice for new Playwright tests.
+
+Before writing an axis-heavy XPath, check for:
+
+1. get_by_role with a clear name
+2. get_by_label for a form field
+3. get_by_test_id for an important custom element
+4. A short CSS selector using a stable attribute
+
+If an XPath needs three or four axes, it is usually telling you that the page needs better test IDs or accessibility labels.
+
+### A good use case
+
+A row in a data table is one reasonable use case. You first identify the row by user-visible content, then target something within that same row.
+
+That mirrors how a real user thinks: find Ravi's row, then click Deactivate.
+
+The goal is always the same: write locators that explain intent and survive normal UI changes.`,
+    handsOn: `Let's practise XPath axes with a small user table.
+
+### Step 1: Create a page
+
+Create a file named xpath-axes.html in your html-practice folder.
+
+~~~html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>XPath Axes Practice</title>
+  </head>
+  <body>
+    <h1>Team members</h1>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Ravi</td>
+          <td>ravi@example.com</td>
+          <td>Active</td>
+          <td><button>Deactivate</button></td>
+        </tr>
+        <tr>
+          <td>Anita</td>
+          <td>anita@example.com</td>
+          <td>Inactive</td>
+          <td><button>Activate</button></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <form>
+      <div class="field">
+        <label>Email</label>
+        <input type="email" name="email" />
+      </div>
+    </form>
+  </body>
+</html>
+~~~
+
+Open the page and open DevTools.
+
+### Step 2: Find Ravi's row
+
+Run this in the Console:
+
+~~~javascript
+$x("//td[normalize-space()='ravi@example.com']/ancestor::tr")
+~~~
+
+It should return Ravi's full table row.
+
+### Step 3: Find the action inside Ravi's row
+
+Run:
+
+~~~javascript
+$x("//td[normalize-space()='ravi@example.com']/ancestor::tr//button")
+~~~
+
+It should return the Deactivate button.
+
+### Step 4: Find a parent and sibling
+
+Run:
+
+~~~javascript
+$x("//input[@name='email']/parent::div")
+$x("//label[normalize-space()='Email']/following-sibling::input")
+~~~
+
+The first query returns the field wrapper. The second returns the email input.
+
+### Step 5: Write the Playwright version
+
+For the Ravi action, write a clearer Playwright locator chain:
+
+~~~python
+row = page.get_by_role("row").filter(has_text="ravi@example.com")
+row.get_by_role("button", name="Deactivate")
+~~~
+
+### Deliverable
+
+You used ancestor, parent, descendant, and following-sibling axes. You also translated a complex XPath into a readable Playwright locator chain.`,
+    challenge: `Create an order table with three rows.
+
+Each row needs:
+
+- Order number
+- Customer name
+- Payment status
+- View details button
+
+Use any realistic data. For example, an order for Priya, another for Imran, and another for Meera.
+
+Then write XPath expressions for:
+
+1. The row containing Priya's name
+2. The View details button inside Priya's row
+3. The parent row of the Paid status cell
+4. Every button inside the table body
+5. The label before an email input in a separate form
+
+Finally, write the Playwright locator chain you would use to click View details for Priya.
+
+Do not try to make one giant XPath for everything. First identify the row, then identify the button inside it. This is easier to understand and easier to debug.`,
+    proTips: [
+      "Use ancestor::tr for table rows when you first identify a unique cell by visible text.",
+      "Use following-sibling only for elements that truly share the same parent.",
+      "Prefer a Playwright locator chain over a long XPath with several axes.",
+      "If a parent or wrapper has no meaningful purpose, do not make your locator depend on it.",
+      "Read axis names in plain English. Parent moves up one level, ancestor moves up many levels, descendant moves down many levels.",
+    ],
+    commonMistakes: [
+      {
+        mistake: "Confusing parent with ancestor",
+        fix: "Parent means exactly one level above. Ancestor can mean parent, grandparent, or any higher container.",
+      },
+      {
+        mistake: "Using following-sibling when the target is nested inside another wrapper",
+        fix: "Siblings must share the exact same parent. Inspect the DOM and use descendant or ancestor when wrappers exist.",
+      },
+      {
+        mistake: "Writing one huge XPath for a table action",
+        fix: "Split the thinking into two parts: locate the row by meaningful content, then locate the action inside it.",
+      },
+      {
+        mistake: "Using following:: when a more specific relationship exists",
+        fix: "Following searches too broadly. Prefer a sibling, descendant, or container-based locator.",
+      },
+      {
+        mistake: "Using axes for every new test",
+        fix: "Axes are a fallback for old or awkward markup. First try role, label, text, or test ID locators.",
+      },
+    ],
+    codeExamples: [
+      {
+        language: "text",
+        title: "Useful XPath axes",
+        code: `//input[@name="email"]/parent::div
+//input[@name="email"]/ancestor::form
+//form/descendant::input
+//label[normalize-space()="Email"]/following-sibling::input`,
+      },
+      {
+        language: "text",
+        title: "Find an action in a specific table row",
+        code: `//td[normalize-space()="ravi@example.com"]
+  /ancestor::tr
+  //button[normalize-space()="Deactivate"]`,
+      },
+      {
+        language: "python",
+        title: "Clear Playwright locator chain for the same table action",
+        code: `row = page.get_by_role("row").filter(
+    has_text="ravi@example.com"
+)
+
+row.get_by_role("button", name="Deactivate").click()`,
+      },
+    ],
+    furtherReading: [
+      {
+        title: "MDN — XPath axes",
+        url: "https://developer.mozilla.org/en-US/docs/Web/XPath/Axes",
+      },
+      {
+        title: "Playwright — Locator filtering",
+        url: "https://playwright.dev/python/docs/locators#filtering-locators",
+      },
+    ],
+    difficulty: "Beginner",
+    estimatedMinutes: 35,
+    tags: ["xpath", "axes", "locators", "web-fundamentals"],
+  },
+    "why-playwright-discourages-xpath": {
+    slug: "why-playwright-discourages-xpath",
+    title: "Why Playwright Discourages XPath",
+    summary:
+      "Understand why XPath is a fallback, not the default locator strategy in Playwright.",
+    whyItMatters:
+      "Locator choices decide whether a test stays useful for months or breaks after one normal UI change.",
+    notes: `XPath is not evil. It is a capable query language and you will see it in old Selenium projects. The problem is not that XPath cannot find elements. The problem is that it often finds elements in ways that are hard to read, easy to break, and far away from how users experience a page.
+
+Playwright encourages locators based on user-facing meaning instead.
+
+That means Playwright wants you to prefer:
+
+1. Role plus accessible name
+2. Labels for form fields
+3. Visible text when it is unique
+4. Test IDs for important custom elements
+5. CSS only when needed
+6. XPath as a last fallback
+
+### Tests should behave like users
+
+A user does not think, 'click the second button inside the third div'.
+
+A user thinks, 'click Log in'.
+
+Playwright tries to help you write tests from this user point of view.
+
+Consider this button:
+
+~~~html
+<button type="submit">Log in</button>
+~~~
+
+You could find it using XPath:
+
+~~~python
+page.locator("//button[normalize-space()='Log in']")
+~~~
+
+That works. But this is clearer:
+
+~~~python
+page.get_by_role("button", name="Log in")
+~~~
+
+The second locator says exactly what the user sees: a button named Log in.
+
+It also confirms something useful about the page. If the developer changes a real button into a clickable div, the role-based locator may fail. That failure is valuable because the page may have become less accessible.
+
+### XPath often depends on implementation details
+
+Many XPath locators depend on nesting, class names, or element positions.
+
+~~~text
+//div[3]/section/div[2]/button
+~~~
+
+This does not explain what the button does. It only explains where the button happens to sit today.
+
+A harmless UI change can break it:
+
+- A cookie banner is added
+- A validation message appears
+- A wrapper div is introduced
+- Cards are reordered
+- A design team changes a layout
+
+The user can still log in. But the test fails because it was testing the page structure, not the product behaviour.
+
+That is a flaky test waiting to happen.
+
+### XPath is harder to review
+
+Imagine a teammate opens a pull request with this line:
+
+~~~python
+page.locator("//div[contains(@class, 'card')][.//span[text()='Pro']]//button[2]")
+~~~
+
+You can slowly decode it. But it takes effort.
+
+Now compare it with:
+
+~~~python
+plan_card = page.get_by_role("article").filter(has_text="Pro")
+plan_card.get_by_role("button", name="Choose plan").click()
+~~~
+
+The second version reads almost like a test step. A reviewer can understand the intent quickly.
+
+Clear tests are easier to maintain when the original author changes teams or leaves the company.
+
+### XPath does not get Playwright's best guidance
+
+Playwright can inspect role-based locators and suggest stable choices in code generation. Its strict mode also helps when a locator matches more than one element.
+
+XPath can still work with auto-waiting and strictness, but it gives you less semantic help. You are responsible for making sure the expression means the right thing.
+
+A role-based locator naturally pushes you to ask good questions:
+
+- Is this really a button?
+- Does it have a clear accessible name?
+- Can a keyboard user reach it?
+- Is there more than one button with this name?
+
+These are product-quality questions, not only testing questions.
+
+### When XPath is still reasonable
+
+Use XPath only when another locator cannot express what you need cleanly.
+
+Some possible cases:
+
+- You are maintaining a legacy suite and cannot change everything now
+- The page has poor markup and no test IDs
+- You need to move from a uniquely identified cell to its table row
+- You are working with XML rather than regular HTML
+- A difficult sibling or ancestor relationship is the only available path
+
+Even then, keep the XPath short and based on stable information.
+
+For example, this is understandable:
+
+~~~text
+//td[normalize-space()="INV-1042"]/ancestor::tr
+~~~
+
+It identifies a row by invoice number. That is much better than walking through six anonymous div elements.
+
+### The best long-term fix
+
+If an element is difficult to locate, do not immediately write clever XPath.
+
+First ask whether the application can improve:
+
+- Add a proper label
+- Use a native button or link
+- Add a meaningful accessible name
+- Add a data-testid attribute
+- Use semantic HTML
+
+This is like putting a clear house number outside a home instead of asking every visitor to count trees from the street corner.
+
+### Your locator priority
+
+For new Playwright code, remember this order:
+
+~~~text
+Role and name
+Label
+Test ID
+Text
+Stable CSS
+XPath only when needed
+~~~
+
+This order keeps tests readable, accessible, and less fragile.`,
+    handsOn: `Let's compare XPath with Playwright's preferred locators.
+
+### Step 1: Create a page
+
+Create a file named locator-comparison.html in your html-practice folder.
+
+~~~html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Locator Comparison</title>
+  </head>
+  <body>
+    <main>
+      <h1>Sign in</h1>
+
+      <form aria-label="Sign in form">
+        <label for="email">Email address</label>
+        <input
+          id="email"
+          name="email"
+          type="email"
+          placeholder="you@example.com"
+        />
+
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" />
+
+        <button type="submit" data-testid="login-submit">
+          Log in
+        </button>
+
+        <a href="/forgot-password">Forgot password?</a>
+      </form>
+    </main>
+  </body>
+</html>
+~~~
+
+### Step 2: Write many ways to find each element
+
+For the Log in button, write these locator options in a notes file:
+
+~~~python
+# XPath
+page.locator("//button[normalize-space()='Log in']")
+
+# Role and name
+page.get_by_role("button", name="Log in")
+
+# Test ID
+page.get_by_test_id("login-submit")
+
+# CSS
+page.locator("[data-testid='login-submit']")
+~~~
+
+For the email field, write:
+
+~~~python
+# XPath
+page.locator("//input[@name='email']")
+
+# Label
+page.get_by_label("Email address")
+
+# Placeholder
+page.get_by_placeholder("you@example.com")
+~~~
+
+### Step 3: Rank them
+
+For each group, rank the locator choices from best to weakest.
+
+A good answer for the button is usually:
+
+1. Role and name
+2. Test ID
+3. CSS using the test ID
+4. XPath
+
+The exact ranking can change by situation. For example, a test ID is excellent when the button text changes with language selection.
+
+### Step 4: Make the page less accessible
+
+Temporarily replace the button with this:
+
+~~~html
+<div class="fake-button">Log in</div>
+~~~
+
+Now think about what changed.
+
+The page may still look clickable. But it is no longer a native button. A role-based locator should make you notice this issue. Keyboard users and screen reader users may also face problems.
+
+Restore the real button afterwards.
+
+### Deliverable
+
+You wrote several locators for the same elements and identified the one that best represents how a user interacts with the page.`,
+    challenge: `Review the following locators and rewrite each one using a better Playwright locator where possible.
+
+~~~python
+page.locator("/html/body/div[1]/main/div[2]/button").click()
+
+page.locator("//input[@placeholder='Email']").fill("ravi@example.com")
+
+page.locator("//div[@class='nav-item'][2]").click()
+
+page.locator("//button[contains(@class, 'primary')]").click()
+~~~
+
+For each one, write:
+
+1. Why it is fragile or unclear
+2. What HTML improvement would make it easier to test
+3. Your preferred Playwright locator
+
+For example, if the navigation item is really a link named Courses, your preferred locator could be:
+
+~~~python
+page.get_by_role("link", name="Courses")
+~~~
+
+If you cannot write a better locator because the HTML gives you no useful information, say what attribute you would ask the frontend developer to add.
+
+This is a real automation-engineer skill: improving the product markup instead of only working around it.`,
+    proTips: [
+      "A locator that reads like a user action is usually easier for the next engineer to maintain.",
+      "Prefer native HTML first. A real button gives Playwright a button role without extra work.",
+      "Use data-testid when visible text is dynamic, translated, or repeated across the page.",
+      "Do not rewrite a whole legacy suite in one day. Replace the weakest XPath locators as you touch related tests.",
+      "If a locator is difficult, inspect the product markup before writing a more complicated expression.",
+    ],
+    commonMistakes: [
+      {
+        mistake: "Treating XPath as forbidden in every situation",
+        fix: "XPath is a fallback, not a banned tool. Use it only when a clearer semantic locator is not practical.",
+      },
+      {
+        mistake: "Using text locators for labels that change with translation",
+        fix: "Use a stable test ID or a translation-aware locator strategy when the product supports multiple languages.",
+      },
+      {
+        mistake: "Choosing a CSS class because it looks readable today",
+        fix: "Classes are often styling details. Prefer roles, labels, or data-testid unless the class is explicitly stable.",
+      },
+      {
+        mistake: "Keeping a long XPath because it currently passes",
+        fix: "A passing locator can still be a maintenance problem. Replace it before it becomes a flaky production issue.",
+      },
+      {
+        mistake: "Adding roles to div elements instead of using native controls",
+        fix: "Use a real button, link, input, or select whenever possible. Native elements give accessibility behaviour for free.",
+      },
+    ],
+    codeExamples: [
+      {
+        language: "python",
+        title: "Same button, two locator styles",
+        code: `# Works, but less clear
+page.locator("//button[normalize-space()='Log in']").click()
+
+# Preferred
+page.get_by_role("button", name="Log in").click()`,
+      },
+      {
+        language: "python",
+        title: "Preferred locators for a login form",
+        code: `page.get_by_label("Email address").fill("ravi@example.com")
+page.get_by_label("Password").fill("secret")
+page.get_by_role("button", name="Log in").click()`,
+      },
+      {
+        language: "python",
+        title: "Use a test ID when it communicates a stable testing contract",
+        code: `page.get_by_test_id("login-submit").click()`,
+      },
+    ],
+    furtherReading: [
+      {
+        title: "Playwright — Locator best practices",
+        url: "https://playwright.dev/python/docs/locators",
+      },
+      {
+        title: "Playwright — Other locators, including XPath",
+        url: "https://playwright.dev/python/docs/other-locators",
+      },
+      {
+        title: "MDN — Accessible HTML",
+        url: "https://developer.mozilla.org/en-US/docs/Learn/Accessibility/HTML",
+      },
+    ],
+    difficulty: "Beginner",
+    estimatedMinutes: 30,
+    tags: ["playwright", "xpath", "locators", "accessibility"],
+  },
+    "dom-vs-html-source": {
+    slug: "dom-vs-html-source",
+    title: "DOM vs HTML Source",
+    summary:
+      "Learn why View Page Source and DevTools can show different HTML, and why Playwright uses the live DOM.",
+    whyItMatters:
+      "Playwright tests the page users actually receive after JavaScript runs. Reading the live DOM helps you choose locators that match reality.",
+    notes: `A beginner often sees two browser options and assumes they show the same thing:
+
+- View Page Source
+- Inspect
+
+They do not.
+
+**View Page Source** shows the HTML sent by the server when the page first loaded.
+
+**Inspect** opens DevTools and shows the current **DOM**. The DOM is the live page structure after the browser and JavaScript have made changes.
+
+Think of ordering food on Swiggy.
+
+The restaurant's original order ticket is like the HTML source. It says what you first asked for.
+
+The bag arriving at your door is like the DOM. It includes the food, maybe an extra spoon, maybe a changed item, and the final state you can actually use.
+
+For Playwright, the delivered bag matters. Playwright interacts with the live DOM.
+
+### What is the DOM?
+
+DOM means **Document Object Model**.
+
+The browser turns HTML into a tree of objects. JavaScript can read, add, remove, and change those objects.
+
+For example, the server may send this HTML:
+
+~~~html
+<body>
+  <div id="app"></div>
+  <script src="/app.js"></script>
+</body>
+~~~
+
+That looks almost empty.
+
+Then JavaScript runs and adds the real page:
+
+~~~html
+<body>
+  <div id="app">
+    <main>
+      <h1>Welcome, Ravi</h1>
+      <button>Log out</button>
+    </main>
+  </div>
+  <script src="/app.js"></script>
+</body>
+~~~
+
+View Page Source may show the first version. DevTools Elements shows the second version.
+
+A Playwright locator can find the Log out button because the button exists in the live DOM.
+
+### Why modern apps make this important
+
+Many React, Angular, Vue, and Next.js applications load data after the first HTML response.
+
+For example:
+
+1. The page loads with a loading message.
+2. JavaScript requests user data from an API.
+3. The API responds.
+4. JavaScript updates the DOM.
+5. The user sees their dashboard.
+
+If you inspect only page source, you may not see the final dashboard content at all.
+
+This is one reason Playwright is useful. It uses a real browser and waits for the live page state.
+
+### A simple DOM change
+
+Suppose the original page has this:
+
+~~~html
+<p id="status">Loading...</p>
+~~~
+
+JavaScript later changes it to:
+
+~~~html
+<p id="status">Payment complete</p>
+~~~
+
+The source may still contain Loading. The DOM now contains Payment complete.
+
+A Playwright test should check the final user-facing state:
+
+~~~python
+expect(page.get_by_text("Payment complete")).to_be_visible()
+~~~
+
+It should not care what text existed for half a second during loading, unless loading behaviour is the thing you are testing.
+
+### DevTools Elements is your testing view
+
+When you need a locator, use **Inspect** and look in the Elements panel.
+
+That view tells you:
+
+- Which elements exist right now
+- Which attributes they have right now
+- Whether an element is inside an iframe or shadow root
+- Whether JavaScript added or removed something
+- Whether text changed after an API response
+
+This is the closest everyday view to what Playwright sees.
+
+### Page source still has a use
+
+View Page Source is not useless. It helps when you want to know:
+
+- What HTML arrived from the server
+- Whether content is server-rendered
+- Whether JavaScript created an element later
+- Which scripts and styles the page loaded initially
+- Whether a meta tag or canonical URL exists in the original response
+
+But do not use it as your main place for writing Playwright locators.
+
+### DOM updates happen all the time
+
+The DOM can change because of:
+
+- Clicking a button
+- Typing into a field
+- Receiving API data
+- Opening a modal
+- Showing a validation message
+- Scrolling a page with lazy-loaded content
+- Signing in or signing out
+- A timer updating a countdown
+
+This is normal web behaviour.
+
+For example, a login form might add an error message only after you click Submit:
+
+~~~html
+<p role="alert">Email is required</p>
+~~~
+
+That alert did not exist in the original page source. It exists after the user action.
+
+A good Playwright test waits for it:
+
+~~~python
+page.get_by_role("button", name="Log in").click()
+expect(page.get_by_role("alert")).to_have_text("Email is required")
+~~~
+
+### The key testing rule
+
+When a user can see or interact with it, find it in the live DOM.
+
+When a locator fails, inspect the current DOM. Do not guess from old source code, a screenshot, or a copied selector from yesterday.
+
+The DOM is the current truth of the page.`,
+    handsOn: `Let's see source and DOM become different.
+
+### Step 1: Create a practice page
+
+Create a file named dom-vs-source.html in your html-practice folder.
+
+~~~html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>DOM vs Source</title>
+  </head>
+  <body>
+    <main id="app">
+      <p id="status">Loading profile...</p>
+    </main>
+
+    <script>
+      setTimeout(() => {
+        document.querySelector("#status").textContent =
+          "Welcome, Ravi!";
+      }, 1500);
+    </script>
+  </body>
+</html>
+~~~
+
+Open the file in your browser.
+
+### Step 2: Inspect the original source
+
+Right-click anywhere on the page and choose View Page Source.
+
+Find the status paragraph. It says:
+
+~~~html
+<p id="status">Loading profile...</p>
+~~~
+
+Keep that tab open.
+
+### Step 3: Inspect the live DOM
+
+Go back to the normal page. Wait two seconds until the visible message changes.
+
+Now right-click the message and choose Inspect.
+
+In the Elements panel, the status paragraph should now say:
+
+~~~html
+<p id="status">Welcome, Ravi!</p>
+~~~
+
+The source stayed the same. The live DOM changed.
+
+### Step 4: Check from the console
+
+Open the Console tab and run:
+
+~~~javascript
+document.querySelector("#status").textContent
+~~~
+
+You should get:
+
+~~~text
+Welcome, Ravi!
+~~~
+
+### Step 5: Think like a Playwright test
+
+If this were a real app, the useful assertion would be:
+
+~~~python
+expect(page.get_by_text("Welcome, Ravi!")).to_be_visible()
+~~~
+
+A Playwright test waits for the user-visible result in the DOM.
+
+### Deliverable
+
+You viewed the initial HTML source, inspected the changed DOM, and confirmed that JavaScript updated the visible page.`,
+    challenge: `Extend your practice page with a button called Show offer.
+
+When the user clicks it, JavaScript should add this content inside main:
+
+~~~html
+<section>
+  <h2>Festival offer</h2>
+  <p>Get 20% off on your first course.</p>
+  <button>Claim offer</button>
+</section>
+~~~
+
+Then answer these questions:
+
+1. Will the offer section appear in View Page Source?
+2. Where can you inspect the offer after clicking the button?
+3. Which Playwright locator would click Show offer?
+4. Which Playwright locator would find Claim offer?
+5. Which assertion would check that the discount message is visible?
+
+Use role-based locators for the buttons. The goal is to practise thinking about what exists before and after a user action.`,
+    proTips: [
+      "Use DevTools Elements, not View Page Source, when choosing a Playwright locator.",
+      "If content appears after a click or API call, inspect the DOM after that action.",
+      "A locator failure can mean the element has not appeared yet, not that the selector is wrong.",
+      "When debugging, check whether the element is hidden, disabled, inside an iframe, or replaced after rendering.",
+      "Playwright's auto-wait helps with live DOM changes. Prefer assertions and locators over manual sleep calls.",
+    ],
+    commonMistakes: [
+      {
+        mistake: "Writing a locator from View Page Source",
+        fix: "Use Inspect and the Elements panel. Playwright interacts with the current DOM, not only the initial response.",
+      },
+      {
+        mistake: "Assuming an element exists before JavaScript finishes loading data",
+        fix: "Use Playwright locators and assertions that wait for the expected user-visible state.",
+      },
+      {
+        mistake: "Using a fixed sleep while waiting for DOM changes",
+        fix: "Wait for a meaningful locator or assertion instead. Fixed sleeps are slow and still fail on a slower network.",
+      },
+      {
+        mistake: "Inspecting the loading state but testing the final state",
+        fix: "Perform the same action in DevTools that your test performs, then inspect the resulting DOM.",
+      },
+      {
+        mistake: "Thinking DOM means only HTML text",
+        fix: "The DOM is a live tree of page objects. JavaScript can change text, attributes, visibility, and structure.",
+      },
+    ],
+    codeExamples: [
+      {
+        language: "text",
+        title: "Initial HTML source",
+        code: `<main id="app">
+  <p id="status">Loading profile...</p>
+</main>`,
+      },
+      {
+        language: "javascript",
+        title: "JavaScript changes the live DOM",
+        code: `document.querySelector("#status").textContent =
+  "Welcome, Ravi!";`,
+      },
+      {
+        language: "python",
+        title: "Playwright checks the final user-visible state",
+        code: `expect(
+    page.get_by_text("Welcome, Ravi!")
+).to_be_visible()`,
+      },
+    ],
+    furtherReading: [
+      {
+        title: "MDN — Introduction to the DOM",
+        url: "https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model/Introduction",
+      },
+      {
+        title: "Playwright — Assertions",
+        url: "https://playwright.dev/python/docs/test-assertions",
+      },
+    ],
+    difficulty: "Beginner",
+    estimatedMinutes: 25,
+    tags: ["dom", "html", "devtools", "web-fundamentals"],
+  },
+    "dynamic-content": {
+    slug: "dynamic-content",
+    title: "Dynamic Content",
+    summary:
+      "Understand content that appears, changes, or disappears after the page first loads.",
+    whyItMatters:
+      "Most modern apps are dynamic. Playwright tests must wait for meaningful page states, not assume every element exists immediately.",
+    notes: `**Dynamic content** is anything on a page that changes after the first screen appears.
+
+This happens constantly in modern web apps.
+
+You open an IRCTC page. First you see a spinner. Then trains appear.
+
+You open Swiggy. First the restaurant cards show skeleton boxes. Then prices, ratings, and delivery times arrive.
+
+You submit a login form. First the button says Log in. Then it may show Signing in. After success, the dashboard appears. After failure, an error message appears.
+
+All of that is dynamic content.
+
+### Static content vs dynamic content
+
+**Static content** is already present when the page loads.
+
+~~~html
+<h1>Playwright Academy</h1>
+<p>Learn browser automation from zero.</p>
+~~~
+
+**Dynamic content** appears or changes later.
+
+~~~html
+<p role="status">Loading courses...</p>
+~~~
+
+After an API request finishes, JavaScript may replace it with:
+
+~~~html
+<ul>
+  <li>HTML fundamentals</li>
+  <li>CSS selectors</li>
+  <li>Playwright locators</li>
+</ul>
+~~~
+
+The browser page is not a fixed poster. It is more like an Indian railway platform display. The board keeps changing as new information arrives.
+
+### Why content becomes dynamic
+
+A page can change because of:
+
+- API responses
+- User clicks
+- Form validation
+- Search input
+- Tabs and accordions
+- Modals opening or closing
+- Infinite scrolling
+- Live notifications
+- Timers and countdowns
+- Sign-in state
+- Feature flags or permissions
+
+For example, an admin dashboard may show different buttons for an admin and a regular employee. The HTML is built based on the current user's permission.
+
+### The loading lifecycle
+
+A common lifecycle looks like this:
+
+1. Page opens
+2. Loading message or skeleton appears
+3. Browser sends an API request
+4. API responds with data
+5. JavaScript updates the DOM
+6. Loading message disappears
+7. Final content becomes visible
+
+A test should understand which part of this lifecycle matters.
+
+If you are testing that courses load successfully, do not only check that Loading courses appears. Check that the course list becomes visible.
+
+~~~python
+expect(page.get_by_role("heading", name="Available courses")).to_be_visible()
+expect(page.get_by_role("listitem")).to_have_count(3)
+~~~
+
+The exact assertion depends on the product. The key idea is to wait for a meaningful final result.
+
+### Why fixed waits are bad
+
+A common beginner reaction is to write a fixed delay:
+
+~~~python
+page.wait_for_timeout(3000)
+~~~
+
+This means: stop for three seconds and hope the page is ready.
+
+It can fail in two opposite ways:
+
+- On a fast run, you waste three seconds for no reason.
+- On a slow run, three seconds is not enough and the test still fails.
+
+It is like waiting outside a restaurant for exactly ten minutes without checking whether your table is ready.
+
+Playwright is better at this. Its locators and web-first assertions wait automatically for the expected condition.
+
+~~~python
+expect(page.get_by_text("Payment successful")).to_be_visible()
+~~~
+
+This waits until the message appears, up to the configured timeout.
+
+### Dynamic does not mean random
+
+A dynamic page should still have clear states.
+
+For a search page, those states may be:
+
+- Empty search box
+- User types a query
+- Loading indicator appears
+- Results appear
+- No-results message appears
+- Network error message appears
+
+Each state is testable.
+
+For example:
+
+~~~python
+search_box = page.get_by_placeholder("Search courses")
+search_box.fill("XPath")
+
+expect(page.get_by_role("heading", name="XPath basics")).to_be_visible()
+~~~
+
+If no result exists, test the meaningful empty state:
+
+~~~python
+expect(page.get_by_text("No courses found")).to_be_visible()
+~~~
+
+### Common dynamic UI patterns
+
+**Loading spinner**
+
+A small icon or text that tells users data is loading.
+
+**Skeleton screen**
+
+Grey placeholder boxes shaped like the final cards or rows.
+
+**Toast notification**
+
+A small success or error message that appears briefly, such as Profile saved.
+
+**Modal**
+
+A dialog that appears above the current page, such as Delete account?
+
+**Accordion**
+
+Extra content appears after a user clicks a heading.
+
+**Infinite scroll**
+
+More items load as the user reaches the bottom of a list.
+
+**Autocomplete**
+
+Suggestions appear while the user types.
+
+All of these need careful locators and assertions.
+
+### How Playwright helps
+
+Playwright locators auto-wait for elements to become actionable. Before clicking, it checks useful things such as visibility and stability.
+
+Assertions also retry until the expected state arrives.
+
+This does not mean every test is magically correct. You still need to wait for the right thing.
+
+Bad test idea:
+
+~~~python
+page.wait_for_timeout(2000)
+page.locator(".card").click()
+~~~
+
+Better test idea:
+
+~~~python
+course_card = page.get_by_role("article", name="XPath basics")
+expect(course_card).to_be_visible()
+course_card.get_by_role("link", name="Start lesson").click()
+~~~
+
+The better version names the product state it needs.
+
+### The simple rule
+
+When testing dynamic content, ask:
+
+- What triggers the change?
+- What should the user see next?
+- What should disappear?
+- What is the final meaningful state?
+- Which locator describes that state clearly?
+
+Test the result, not the passage of time.`,
+    handsOn: `Let's build a small page with loading and final states.
+
+### Step 1: Create a practice file
+
+Create a file named dynamic-content.html in your html-practice folder.
+
+~~~html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Dynamic Content Practice</title>
+  </head>
+  <body>
+    <main>
+      <h1>Course library</h1>
+      <p id="status" role="status">Loading courses...</p>
+      <ul id="course-list"></ul>
+    </main>
+
+    <script>
+      setTimeout(() => {
+        const courses = [
+          "HTML fundamentals",
+          "CSS selectors",
+          "Playwright locators",
+        ];
+
+        const list = document.querySelector("#course-list");
+        const status = document.querySelector("#status");
+
+        list.innerHTML = courses
+          .map((course) => "<li>" + course + "</li>")
+          .join("");
+
+        status.textContent = "Courses loaded";
+      }, 1500);
+    </script>
+  </body>
+</html>
+~~~
+
+Open the file in your browser.
+
+### Step 2: Watch the states
+
+For the first moment, you should see Loading courses.
+
+After around one and a half seconds, the course list appears and the status changes to Courses loaded.
+
+Open DevTools and inspect the list before and after the change.
+
+### Step 3: Test the final DOM in the console
+
+After the courses load, run:
+
+~~~javascript
+document.querySelectorAll("#course-list li").length
+document.querySelector("#status").textContent
+~~~
+
+You should get 3 and Courses loaded.
+
+### Step 4: Write Playwright expectations
+
+Imagine this page is part of your app. Write assertions for the final state:
+
+~~~python
+expect(page.get_by_role("status")).to_have_text("Courses loaded")
+expect(page.get_by_role("listitem")).to_have_count(3)
+expect(
+    page.get_by_role("listitem", name="Playwright locators")
+).to_be_visible()
+~~~
+
+Notice that none of these need a fixed delay.
+
+### Deliverable
+
+You watched a loading state change into final content, inspected both DOM states, and wrote Playwright assertions for the final result.`,
+    challenge: `Extend the practice page with a search box and a Search button.
+
+Use this behaviour:
+
+- If the user searches for Playwright, show one result named Playwright locators.
+- If the user searches for Python, show a message saying No courses found.
+- While the search is running, show Searching...
+- Add a short delay so you can see the loading state.
+
+Then write Playwright tests for these two flows:
+
+1. Search for Playwright and verify the result appears.
+2. Search for Python and verify the no-results message appears.
+
+For both tests, do not use a fixed timeout. Wait for the final text or final result instead.
+
+Bonus: add a Clear search button that removes the result or no-results message. Write one assertion for the cleared state.`,
+    proTips: [
+      "Wait for a user-visible result, such as a heading, row, alert, or button, instead of waiting for a number of milliseconds.",
+      "Use role=status for loading updates and role=alert for important error messages when building accessible apps.",
+      "Test both success and empty states. A search page is incomplete if it only works when results exist.",
+      "Inspect the DOM after the user action that triggers the change, not only when the page first opens.",
+      "If content changes often, use stable locators based on roles, labels, and test IDs instead of list positions.",
+    ],
+    commonMistakes: [
+      {
+        mistake: "Using a fixed wait before every assertion",
+        fix: "Use an assertion that waits for a meaningful state, such as visible text, a loaded row, or a success alert.",
+      },
+      {
+        mistake: "Checking only that the loading spinner appeared",
+        fix: "Also verify that loading finishes and the intended content, empty state, or error state appears.",
+      },
+      {
+        mistake: "Selecting the third card because it is third today",
+        fix: "Locate cards by meaningful content, role, or test ID. Dynamic lists can change order.",
+      },
+      {
+        mistake: "Ignoring temporary error messages and toast notifications",
+        fix: "Test important feedback. Use accessible roles such as alert or status so users and tests can find it.",
+      },
+      {
+        mistake: "Assuming a missing element means the locator is wrong",
+        fix: "Check whether the action, API response, permission, or scroll position needed to create that element has happened.",
+      },
+    ],
+    codeExamples: [
+      {
+        language: "python",
+        title: "Avoid fixed waits",
+        code: `# Avoid this
+page.wait_for_timeout(3000)
+
+# Prefer a meaningful assertion
+expect(
+    page.get_by_text("Courses loaded")
+).to_be_visible()`,
+      },
+      {
+        language: "python",
+        title: "Test search results after dynamic loading",
+        code: `page.get_by_placeholder("Search courses").fill("Playwright")
+
+expect(
+    page.get_by_role("listitem", name="Playwright locators")
+).to_be_visible()`,
+      },
+      {
+        language: "python",
+        title: "Test a dynamic empty state",
+        code: `page.get_by_placeholder("Search courses").fill("Python")
+
+expect(
+    page.get_by_text("No courses found")
+).to_be_visible()`,
+      },
+    ],
+    furtherReading: [
+      {
+        title: "Playwright — Auto-waiting",
+        url: "https://playwright.dev/python/docs/actionability",
+      },
+      {
+        title: "Playwright — Assertions",
+        url: "https://playwright.dev/python/docs/test-assertions",
+      },
+      {
+        title: "MDN — Web API introduction",
+        url: "https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Client-side_web_APIs/Introduction",
+      },
+    ],
+    difficulty: "Beginner",
+    estimatedMinutes: 30,
+    tags: ["dynamic-content", "dom", "auto-wait", "web-fundamentals"],
+  },
 };

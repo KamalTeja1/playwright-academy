@@ -378,7 +378,62 @@ export const lessonsByModule: Record<string, Lesson[]> = {
       difficulty: "Beginner",
       topics: [],
     },
+        {
+      slug: "xpath-absolute-vs-relative",
+      title: "XPath: Absolute vs Relative",
+      summary:
+        "Two XPath styles, why full paths break easily, and how to recognise a safer one.",
+      estimatedMinutes: 30,
+      difficulty: "Beginner",
+      topics: [],
+    },
+    {
+      slug: "xpath-predicates",
+      title: "XPath Predicates",
+      summary:
+        "Use square brackets to filter XPath by attributes, text, position, and conditions.",
+      estimatedMinutes: 30,
+      difficulty: "Beginner",
+      topics: [],
+    },
+    {
+      slug: "xpath-axes",
+      title: "XPath Axes",
+      summary:
+        "Move through parent, child, sibling, ancestor, and descendant relationships.",
+      estimatedMinutes: 35,
+      difficulty: "Beginner",
+      topics: [],
+    },
+    {
+      slug: "why-playwright-discourages-xpath",
+      title: "Why Playwright Discourages XPath",
+      summary:
+        "Why user-facing locators are usually clearer and more stable than XPath.",
+      estimatedMinutes: 30,
+      difficulty: "Beginner",
+      topics: [],
+    },
+    {
+      slug: "dom-vs-html-source",
+      title: "DOM vs HTML Source",
+      summary:
+        "Why DevTools and View Page Source can differ, and which one Playwright sees.",
+      estimatedMinutes: 25,
+      difficulty: "Beginner",
+      topics: [],
+    },
+    {
+      slug: "dynamic-content",
+      title: "Dynamic Content",
+      summary:
+        "How pages update after loading, and how Playwright waits for useful final states.",
+      estimatedMinutes: 30,
+      difficulty: "Beginner",
+      topics: [],
+    },
   ],
+  
 };
 
 export function getModuleLessons(moduleSlug: string): Lesson[] | undefined {

@@ -1,4 +1,3 @@
-cat > split-lessons.cjs <<'EOF'
 const fs = require("node:fs");
 const path = require("node:path");
 const ts = require("typescript");
@@ -243,4 +242,3 @@ try {
   console.error(`\nMigration stopped:\n${error.message}`);
   process.exitCode = 1;
 }
-EOF

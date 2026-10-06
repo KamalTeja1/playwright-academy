@@ -8,6 +8,7 @@ import module6 from "./modules/environment-setup";
 import module7 from "./modules/web-fundamentals";
 import module8 from "./modules/automation-concepts";
 import module9 from "./modules/python-core";
+import module10 from "./modules/collections-control-flow";
 
 export type { Topic, Lesson } from "./types";
 
@@ -21,6 +22,7 @@ export const lessonsByModule: Record<string, Lesson[]> = {
   "web-fundamentals": module7,
   "automation-concepts": module8,
   "python-core": module9,
+  "collections-control-flow": module10,
 };
 
 export function getModuleLessons(moduleSlug: string): Lesson[] | undefined {

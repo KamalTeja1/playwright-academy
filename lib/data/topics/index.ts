@@ -8,6 +8,7 @@ import { topics as phase0Module02 } from "./phase-0/module-0-2";
 import { topics as phase0Module03 } from "./phase-0/module-0-3";
 import { topics as phase1Module11 } from "./phase-1/module-1-1";
 import { topics as phase1Module12 } from "./phase-1/module-1-2";
+import { topics as phase1Module13 } from "./phase-1/module-1-3";
 import type { TopicContent } from "./types";
 
 export type {
@@ -28,6 +29,7 @@ export const topics: Record<string, TopicContent> = {
   ...phase0Module03,
   ...phase1Module11,
   ...phase1Module12,
+  ...phase1Module13,
 };
 
 export function getTopicBySlug(slug: string): TopicContent | undefined {

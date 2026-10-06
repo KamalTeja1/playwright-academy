@@ -1,0 +1,86 @@
+import type { Lesson } from "../types";
+
+export const lessons: Lesson[] = [
+  {
+    slug: "defining-functions",
+    title: "Defining Functions",
+    summary: "Name a block of code with def and call it by name.",
+    estimatedMinutes: 30,
+    difficulty: "Beginner",
+    topics: [],
+  },
+  {
+    slug: "docstrings",
+    title: "Docstrings and Comments",
+    summary: "Describe functions with docstrings and explain why with comments.",
+    estimatedMinutes: 20,
+    difficulty: "Beginner",
+    topics: [],
+  },
+  {
+    slug: "function-arguments",
+    title: "Function Arguments",
+    summary: "Positional, keyword and default arguments, and the mutable default trap.",
+    estimatedMinutes: 35,
+    difficulty: "Beginner",
+    topics: [],
+  },
+  {
+    slug: "args-kwargs",
+    title: "*args and **kwargs",
+    summary: "Accept any number of arguments and unpack lists and dictionaries into calls.",
+    estimatedMinutes: 30,
+    difficulty: "Intermediate",
+    topics: [],
+  },
+  {
+    slug: "return-values",
+    title: "Return Values",
+    summary: "Hand results back with return, including early returns and several values.",
+    estimatedMinutes: 25,
+    difficulty: "Beginner",
+    topics: [],
+  },
+  {
+    slug: "lambdas",
+    title: "Lambda Functions",
+    summary: "Tiny one-line functions, used mainly as sort keys.",
+    estimatedMinutes: 25,
+    difficulty: "Intermediate",
+    topics: [],
+  },
+  {
+    slug: "scope-nonlocal",
+    title: "Scope, global and nonlocal",
+    summary: "Where names can be seen, and how global and nonlocal change the rules.",
+    estimatedMinutes: 30,
+    difficulty: "Intermediate",
+    topics: [],
+  },
+  {
+    slug: "modules-packages",
+    title: "Modules and Packages",
+    summary: "Split code into files and folders and bring it back with import.",
+    estimatedMinutes: 35,
+    difficulty: "Beginner",
+    topics: [],
+  },
+  {
+    slug: "init-file",
+    title: "The __init__.py File",
+    summary: "Mark a folder as a package and shape what it exposes.",
+    estimatedMinutes: 25,
+    difficulty: "Intermediate",
+    topics: [],
+  },
+  {
+    slug: "standard-library",
+    title: "The Standard Library",
+    summary: "A tour of the modules that ship with Python.",
+    estimatedMinutes: 35,
+    difficulty: "Intermediate",
+    topics: [],
+  },
+];
+
+export default lessons;

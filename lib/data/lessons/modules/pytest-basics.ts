@@ -1,0 +1,86 @@
+import type { Lesson } from "../types";
+
+const lessons: Lesson[] = [
+  {
+    slug: "installing-pytest",
+    title: "Installing pytest",
+    summary: "Install pytest in a project environment and run a test.",
+    estimatedMinutes: 25,
+    difficulty: "Beginner",
+    topics: [],
+  },
+  {
+    slug: "test-discovery",
+    title: "Test Discovery",
+    summary: "Name tests so pytest can find and collect them.",
+    estimatedMinutes: 25,
+    difficulty: "Beginner",
+    topics: [],
+  },
+  {
+    slug: "running-tests",
+    title: "Running Tests",
+    summary: "Run all tests or select a file, test, or group.",
+    estimatedMinutes: 25,
+    difficulty: "Beginner",
+    topics: [],
+  },
+  {
+    slug: "writing-assertions",
+    title: "Writing Assertions",
+    summary: "Check expected behaviour with clear assert statements.",
+    estimatedMinutes: 25,
+    difficulty: "Beginner",
+    topics: [],
+  },
+  {
+    slug: "pytest-raises",
+    title: "Testing Expected Exceptions",
+    summary: "Use pytest.raises to check expected errors.",
+    estimatedMinutes: 25,
+    difficulty: "Beginner",
+    topics: [],
+  },
+  {
+    slug: "pytest-approx",
+    title: "Comparing Approximate Numbers",
+    summary: "Compare floating-point results with pytest.approx.",
+    estimatedMinutes: 25,
+    difficulty: "Beginner",
+    topics: [],
+  },
+  {
+    slug: "skip-and-skipif",
+    title: "Skipping Tests",
+    summary: "Skip tests when a known runtime or environment condition applies.",
+    estimatedMinutes: 25,
+    difficulty: "Beginner",
+    topics: [],
+  },
+  {
+    slug: "xfail",
+    title: "Expected Failures with xfail",
+    summary: "Keep known failing tests visible with an expected-failure marker.",
+    estimatedMinutes: 25,
+    difficulty: "Beginner",
+    topics: [],
+  },
+  {
+    slug: "custom-markers",
+    title: "Custom Markers",
+    summary: "Label and select test groups with registered custom markers.",
+    estimatedMinutes: 25,
+    difficulty: "Beginner",
+    topics: [],
+  },
+  {
+    slug: "test-reports",
+    title: "Test Reports",
+    summary: "Read pytest summaries and generate XML or HTML reports.",
+    estimatedMinutes: 25,
+    difficulty: "Beginner",
+    topics: [],
+  },
+];
+
+export default lessons;

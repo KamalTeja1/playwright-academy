@@ -12,6 +12,10 @@ import { topics as phase1Module13 } from "./phase-1/module-1-3";
 import { topics as phase1Module14 } from "./phase-1/module-1-4";
 import { topics as phase1Module15 } from "./phase-1/module-1-5";
 import { topics as phase1Module16 } from "./phase-1/module-1-6";
+import { topics as phase2Module21 } from "./phase-2/module-2-1";
+import { topics as phase2Module22 } from "./phase-2/module-2-2";
+import { topics as phase2Module23 } from "./phase-2/module-2-3";
+import { topics as phase2Module24 } from "./phase-2/module-2-4";
 import type { TopicContent } from "./types";
 
 export type {
@@ -36,6 +40,10 @@ export const topics: Record<string, TopicContent> = {
   ...phase1Module14,
   ...phase1Module15,
   ...phase1Module16,
+  ...phase2Module21,
+  ...phase2Module22,
+  ...phase2Module23,
+  ...phase2Module24,
 };
 
 export function getTopicBySlug(slug: string): TopicContent | undefined {

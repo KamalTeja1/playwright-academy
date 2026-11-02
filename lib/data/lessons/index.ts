@@ -14,6 +14,10 @@ import module12 from "./modules/files-json-exceptions";
 import module13 from "./modules/oop";
 import module14 from "./modules/api-basics";
 
+import module15 from "./modules/pytest-basics";
+import module16 from "./modules/fixtures";
+import module17 from "./modules/parametrization-plugins";
+import module18 from "./modules/organization";
 export type { Topic, Lesson } from "./types";
 
 export const lessonsByModule: Record<string, Lesson[]> = {
@@ -31,6 +35,10 @@ export const lessonsByModule: Record<string, Lesson[]> = {
   "files-json-exceptions": module12,
   "oop": module13,
   "api-basics": module14,
+  "pytest-basics": module15,
+  "fixtures": module16,
+  "parametrization-plugins": module17,
+  "organization": module18,
 };
 
 export function getModuleLessons(moduleSlug: string): Lesson[] | undefined {

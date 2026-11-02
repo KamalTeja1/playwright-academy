@@ -1,0 +1,86 @@
+import type { Lesson } from "../types";
+
+export const lessons: Lesson[] = [
+  {
+    slug: "classes-objects",
+    title: "Classes and Objects",
+    summary: "Define classes and create objects with data and behavior.",
+    estimatedMinutes: 25,
+    difficulty: "Beginner",
+    topics: [],
+  },
+  {
+    slug: "init-method",
+    title: "The __init__ Method",
+    summary: "Initialize new objects with consistent, validated state.",
+    estimatedMinutes: 25,
+    difficulty: "Beginner",
+    topics: [],
+  },
+  {
+    slug: "instance-vs-class-attributes",
+    title: "Instance and Class Attributes",
+    summary: "Distinguish per-instance state from class-level attributes.",
+    estimatedMinutes: 30,
+    difficulty: "Intermediate",
+    topics: [],
+  },
+  {
+    slug: "classmethod-staticmethod",
+    title: "Class Methods and Static Methods",
+    summary: "Choose methods based on whether they need instance or class state.",
+    estimatedMinutes: 30,
+    difficulty: "Intermediate",
+    topics: [],
+  },
+  {
+    slug: "property-decorator",
+    title: "The property Decorator",
+    summary: "Compute or validate values through attribute-style access.",
+    estimatedMinutes: 30,
+    difficulty: "Intermediate",
+    topics: [],
+  },
+  {
+    slug: "inheritance",
+    title: "Inheritance",
+    summary: "Reuse and specialize behavior with base and derived classes.",
+    estimatedMinutes: 30,
+    difficulty: "Intermediate",
+    topics: [],
+  },
+  {
+    slug: "super-function",
+    title: "The super() Function",
+    summary: "Extend inherited initialization and behavior with super().",
+    estimatedMinutes: 25,
+    difficulty: "Intermediate",
+    topics: [],
+  },
+  {
+    slug: "dunder-methods",
+    title: "Dunder Methods",
+    summary: "Customize string display, equality, length, and other Python operations.",
+    estimatedMinutes: 30,
+    difficulty: "Intermediate",
+    topics: [],
+  },
+  {
+    slug: "composition-vs-inheritance",
+    title: "Composition vs. Inheritance",
+    summary: "Choose between specializing a class and using a collaborator.",
+    estimatedMinutes: 25,
+    difficulty: "Intermediate",
+    topics: [],
+  },
+  {
+    slug: "dataclasses",
+    title: "Dataclasses",
+    summary: "Reduce boilerplate for classes that primarily store structured data.",
+    estimatedMinutes: 30,
+    difficulty: "Intermediate",
+    topics: [],
+  },
+];
+
+export default lessons;

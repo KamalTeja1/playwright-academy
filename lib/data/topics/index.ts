@@ -16,6 +16,8 @@ import { topics as phase2Module21 } from "./phase-2/module-2-1";
 import { topics as phase2Module22 } from "./phase-2/module-2-2";
 import { topics as phase2Module23 } from "./phase-2/module-2-3";
 import { topics as phase2Module24 } from "./phase-2/module-2-4";
+import { topics as phase3Module31 } from "./phase-3/module-3-1";
+import { topics as phase3Module32 } from "./phase-3/module-3-2";
 import type { TopicContent } from "./types";
 
 export type {
@@ -44,6 +46,8 @@ export const topics: Record<string, TopicContent> = {
   ...phase2Module22,
   ...phase2Module23,
   ...phase2Module24,
+...phase3Module31,
+...phase3Module32,
 };
 
 export function getTopicBySlug(slug: string): TopicContent | undefined {

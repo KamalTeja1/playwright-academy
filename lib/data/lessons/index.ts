@@ -18,6 +18,8 @@ import module15 from "./modules/pytest-basics";
 import module16 from "./modules/fixtures";
 import module17 from "./modules/parametrization-plugins";
 import module18 from "./modules/organization";
+import module19 from "./modules/setup-core-architecture";
+import module20 from "./modules/locators-deep-dive";
 export type { Topic, Lesson } from "./types";
 
 export const lessonsByModule: Record<string, Lesson[]> = {
@@ -39,6 +41,8 @@ export const lessonsByModule: Record<string, Lesson[]> = {
   "fixtures": module16,
   "parametrization-plugins": module17,
   "organization": module18,
+"setup-core-architecture": module19,
+"locators-deep-dive": module20,
 };
 
 export function getModuleLessons(moduleSlug: string): Lesson[] | undefined {
